@@ -41,27 +41,20 @@ These dependencies are included in the provided tools resources bundle.
 ```bash
 wget https://storage.googleapis.com/mctp-open-share/polytect/tools-1.0.0.tar.gz --directory-prefix=resources
 polytect setup_tools
-conda activate polytect
 ```
 
 ### Setup references
 
 ```bash
+conda activate polytect
 wget https://storage.googleapis.com/mctp-open-share/polytect/hs-hg38-1.0.0.tar.gz --directory-prefix=resources
-tar --strip 1 -xf resources/hs-hg38-1.0.0.tar.gz -C refs
-polytect setup_refs
+polytect make_refs
 ```
 
 ## Running
 
-### Acticate the Conda environment and setup path.
+Before you can use any of the polytect commands, you need to activate the Conda environment and setup path.
 
 ```bash
 conda activate polytect
-```
-
-### Buidling Re
-
-```bash
-polytect make_refs
 ```
