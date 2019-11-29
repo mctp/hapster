@@ -15,7 +15,6 @@ Commands:
   exit 1
 }
 
-
 TOOLS_VER=1.0.0
 REFS_VER=1.0.0
 COMMAND_ARGS=${@#"$1"}
@@ -25,7 +24,7 @@ case "$1" in
         bash $POLYTECT_DIR/build/tools-$TOOLS_VER/setup-tools.sh
         ;;
     make_refs|r)
-        tar --strip 1 -xf $POLYTECT_DIR/resources/$REFS_VER.tar.gz -C $POLYTECT_DIR/refs
+        tar --strip 1 -xf $POLYTECT_DIR/resources/hs-hg38-$REFS_VER.tar.gz -C $POLYTECT_DIR/refs
         snakemake \
             --configfile $POLYTECT_DIR/config/hs-hg38-hla.yaml \
             --snakefile $POLYTECT_DIR/pipelines/make_refs.smk \
