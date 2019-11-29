@@ -7,24 +7,30 @@ cli_help() {
   cli_name=${0##*/}
   echo "Usage: $cli_name [command]
 Commands:
-  make_refs Make all required reference files
-  make_matrices Similate haplotyping matrices
-  *         Help
+  setup_tools	Setup required tools
+  make_refs	Make all required reference files
+  make_mats	Similate haplotyping matrices
+  *		Help
 "
   exit 1
 }
 
+REFS_VER=hs-hg38-1.0.0
 COMMAND_ARGS=${@#"$1"}
 case "$1" in
-    make_refs|m)
-        echo $COMMAND_ARGS
-        snakemake -n -s $POLYTECT_DIR/pipelines/make_refs.smk \
-                  -p --cores $NCORES \
-                  --configfile $POLYTECT_DIR/config/hs-hg38-hla.yaml
+    setup_tools|t)
+        tar -xvf $POLYTECT_DIR/resources/tools-1.0.0.tar.gz -C $POLYTECT_DIR/build
+        bash $POLYTECT_DIR/build/tools-1.0.0/setup-tools.sh
         ;;
-    
+    make_refs|r)
+        # tar --strip 1 -xf resources/$REFS_VER.tar.gz -C refs
+        snakemake \
+            --configfile $POLYTECT_DIR/config/hs-hg38-hla.yaml \
+            --snakefile $POLYTECT_DIR/pipelines/make_refs.smk \
+            --directory $POLYTECT_DIR \
+            --cores $NCORES
+        ;;
     *)
         cli_help
         ;;
-    
 esac

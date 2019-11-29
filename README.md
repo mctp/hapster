@@ -2,15 +2,26 @@
 
 ## Installation
 
-Clone repository
-```
-git clone https://github.com/mctp/polytect
-```
+Polytect is developed and tested on Ubuntu 18.04, but should work on modern Linux distributions.
 
 ### Pre-requisites
 
 - Python 3.7
-- Miniconda3
+- Miniconda3 (https://docs.conda.io/en/latest/miniconda.html)
+- gcc tool chain to compile programs
+
+### Setup Polytect base directory
+
+Clone repository from github:
+```bash
+git clone https://github.com/mctp/polytect
+```
+
+Modify path to get access to `polytect` command:
+```bash
+cd polytect
+PATH=$PWD/bin:$PATH
+```
 
 ### Setup External Dependencies
 
@@ -29,10 +40,10 @@ Polytect depends on a number of dependencies managed by conda and select one whi
 
 These dependencies are included in the provide tools resource bundle.
 
-```
+```bash
 wget <TODO>
-tar xf resources/tools-1.0.0.tar.gz -C build
-bash build/tools-1.0.0/setup-tools.sh
+polytect setup_tools
+conda activate polytect
 ```
 
 ### Setup references
@@ -40,6 +51,7 @@ bash build/tools-1.0.0/setup-tools.sh
 ```bash
 wget <TODO>
 tar --strip 1 -xf resources/hs-hg38-1.0.0.tar.gz -C refs
+polytect setup_refs
 ```
 
 ## Running
@@ -48,7 +60,6 @@ tar --strip 1 -xf resources/hs-hg38-1.0.0.tar.gz -C refs
 
 ```bash
 conda activate polytect
-PATH=$POLYTECT_DIR/bin:$PATH
 ```
 
 ### Buidling Re
