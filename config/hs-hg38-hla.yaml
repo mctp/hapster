@@ -1,0 +1,22 @@
+# Primary assembly reference is used to create the .alt file for use with bwa-postalt
+# Needs to be autosomes only so that minimap2 can only align to main chromosomes
+primary_ref: refs/hs-hg38/genome/hg38.fa
+
+# Analysis reference is used as the base upon which we add our alternate allele sequences
+# This differes from the autosome reference in that it should contain alt contigs, decoys, etc.
+analysis_ref: refs/hs-hg38/genome/hg38_alt_decoy.fa
+
+# Prefix for gene fa/gff files
+gene_prefix: refs/hs-hg38/hla
+
+# List of genes names
+genes:
+  - A
+  - B
+  - C
+  - DPA1
+  - DPB1
+  - DQA1
+  - DQB1
+  - DRA
+  - DRB1

@@ -1,1 +1,30 @@
 #!/usr/bin/env bash
+set -e
+export POLYTECT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
+export NCORES=$(nproc --all)
+
+cli_help() {
+  cli_name=${0##*/}
+  echo "Usage: $cli_name [command]
+Commands:
+  make_refs Make all required reference files
+  make_matrices Similate haplotyping matrices
+  *         Help
+"
+  exit 1
+}
+
+COMMAND_ARGS=${@#"$1"}
+case "$1" in
+    make_refs|m)
+        echo $COMMAND_ARGS
+        snakemake -n -s $POLYTECT_DIR/pipelines/make_refs.smk \
+                  -p --cores $NCORES \
+                  --configfile $POLYTECT_DIR/config/hs-hg38-hla.yaml
+        ;;
+    
+    *)
+        cli_help
+        ;;
+    
+esac
