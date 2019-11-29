@@ -27,21 +27,19 @@ PATH=$PWD/bin:$PATH
 
 Polytect depends on a number of dependencies managed by conda and select one which are not GATK4, hpseq, biobambam2 and bwa.kit.
 
-- bwa.kit (==0.7.15)
-  No other version supported.
+- bwa.kit (==0.7.15) No other version supported.
   (https://sourceforge.net/projects/bio-bwa/files/bwakit/)  
-- gatk4 (==4.1.2.0)
-  No other version supported.
+- gatk4 (==4.1.2.0) No other version supported.
   (https://github.com/broadinstitute/gatk/releases/download/4.1.2.0/gatk-4.1.2.0.zip)  
 - hpseq
   (https://github.com/mcieslik-mctp/hpseq)  
 - biobambam2
   (https://gitlab.com/german.tischler/biobambam2/-/releases)  
 
-These dependencies are included in the provide tools resource bundle.
+These dependencies are included in the provided tools resources bundle.
 
 ```bash
-wget <TODO>
+wget https://storage.googleapis.com/mctp-open-share/polytect/tools-1.0.0.tar.gz --directory-prefix=resources
 polytect setup_tools
 conda activate polytect
 ```
@@ -49,7 +47,7 @@ conda activate polytect
 ### Setup references
 
 ```bash
-wget <TODO>
+wget https://storage.googleapis.com/mctp-open-share/polytect/hs-hg38-1.0.0.tar.gz --directory-prefix=resources
 tar --strip 1 -xf resources/hs-hg38-1.0.0.tar.gz -C refs
 polytect setup_refs
 ```
