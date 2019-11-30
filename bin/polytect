@@ -5,33 +5,72 @@ export NCORES=$(nproc --all)
 
 cli_help() {
   cli_name=${0##*/}
-  echo "Usage: $cli_name [command]
+  echo "Usage: $cli_name [gene] [command] 
+Help: $cli_name help
+  
+Supported genes:
+  hs-hg38-hla   Variant calling of Hsapiens HLA genes
 Commands:
-  setup_tools	Setup required tools
-  make_refs	Make all required reference files
-  make_mats	Similate haplotyping matrices
-  *		Help
+     setup_tools	Setup required tools
+           args:	
+       make_refs	Make all required reference files
+           args:	     
+       make_mats	Similate haplotyping matrices
+           args:	<capture_targets>
+   extract_reads	Extract reads for polymorphic gene
+           args:        [patient] [sample] [aligned_file] <cram_reference>
+  *	   Help
 "
   exit 1
 }
 
-TOOLS_VER=1.0.0
-REFS_VER=1.0.0
-COMMAND_ARGS=${@#"$1"}
 case "$1" in
-    setup_tools|t)
+    hs-hg38-hla)
+    ;;
+    help|"")
+        cli_help
+        ;;
+    *)
+        echo -e "Gene not supported.\n"
+        cli_help
+        ;;
+esac
+
+
+case "$2" in
+    setup_tools)
+        TOOLS_VER=1.0.0 ## TODO: refactor or remove versioning
         tar -xvf $POLYTECT_DIR/resources/tools-$TOOLS_VER.tar.gz -C $POLYTECT_DIR/build
         bash $POLYTECT_DIR/build/tools-$TOOLS_VER/setup-tools.sh
         ;;
-    make_refs|r)
+    make_refs)
+        REFS_VER=1.0.0 ## TODO: refactor or remove versioning
         tar --strip 1 -xf $POLYTECT_DIR/resources/hs-hg38-$REFS_VER.tar.gz -C $POLYTECT_DIR/refs
         snakemake \
-            --configfile $POLYTECT_DIR/config/hs-hg38-hla.yaml \
+            --configfile $POLYTECT_DIR/config/$1.yaml \
             --snakefile $POLYTECT_DIR/pipelines/make_refs.smk \
             --directory $POLYTECT_DIR \
             --cores $NCORES
         ;;
+    extract_reads)
+        snakemake \
+            --configfile $POLYTECT_DIR/config/$1.yaml \
+            --config POLYTECT_DIR=$POLYTECT_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     aligned_file=$5 \
+                     cram_reference=$6 \
+            --snakefile $POLYTECT_DIR/pipelines/extract_reads.smk \
+            --directory $PWD \
+            --cores $NCORES
+        ;;
+    "")
+        echo -e "Command not set.\n"
+        cli_help
+        ;;
     *)
+        echo -e "Command not supported.\n"
         cli_help
         ;;
 esac
