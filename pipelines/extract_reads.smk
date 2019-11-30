@@ -43,7 +43,7 @@ elif bambam_format == "bam" or bambam_format == "sam":
 
 rule all:
     input:
-        bam_for_kmer_filter = f"results/{patient}/alignments/{sample}_extracted_with_blacklist.bam",
+        bam_for_kmer_filter = f"results/{patient}/alignments/{sample}/{sample}_extracted_with_blacklist.bam",
         fq1 = expand(f"results/{patient}/seqs/{sample}/{sample}_" + "{gene}_1.fq", gene = genes),
         fq2 = expand(f"results/{patient}/seqs/{sample}/{sample}_" + "{gene}_2.fq", gene = genes),
         bam = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_grch38_plus.bam", gene = genes)
@@ -189,7 +189,7 @@ rule unalign_reads_from_alt:
     input:
         in_bam = rules.extract_all_gene_regions.output.out_bam
     output:
-        out_bam = f"results/{patient}/alignments/{sample}_extracted_with_blacklist.bam",
+        out_bam = f"results/{patient}/alignments/{sample}/{sample}_extracted_with_blacklist.bam",
         fq1 = temp(f"temp/{sample}/{sample}_gene_extracted_1.fq"),
         fq2 = temp(f"temp/{sample}/{sample}_gene_extracted_2.fq")
     run:
