@@ -1,31 +1,29 @@
+import os
 import pysam
 from pathlib import Path
 
-configfile: '/home/mumphrey/Projects/hla_pipeline/config/extract_reads_config.yaml'
-
-#Inputs
-aligned_file = config['aligned_file']
-
-#Algorithm parameters
-threads = config['threads']
-genes = config['genes']
-
-#Reference files
-original_reference = config['original_reference']
-kmers = config['kmers']
-reference = config['reference']
-alt_reference = reference + ".alt"
-regions_file = config['regions_file']
-extraction_reference = config['extraction_reference']
-
-#Sample information
+# polytect runtime
+PD = Path(config['POLYTECT_DIR'])
+NCORES = config['NCORES']
+# inputs
 patient = config['patient']
 sample = config['sample']
+aligned_file = config['aligned_file']
+cram_reference = config['cram_reference']
 
-#Derived variables
+# polytect global references
+genes = config['genes']
+kmers = PD / config['gene_prefix'] / "sim" / "kmers.txt"
+regions = PD / config['gene_prefix'] / "sim" / "regions.txt"
+complete_reference = PD / config['gene_prefix'] / "fa" / "complete.fa"
+complete_reference_alt = PD / config['gene_prefix'] / "fa" / "complete.fa.alt"
+extraction_reference = PD / config['gene_prefix'] / "fa" / "extraction.fa"
+extraction_reference_alt = PD / config['gene_prefix'] / "fa" / "extraction.fa.alt"
+
+# derived variables
 full_regions = ""
 allele_regions = {}
-with open(regions_file, 'r') as f:
+with open(regions, 'r') as f:
     for line in f:
         line = line.strip().split()
         gene = line[0].replace(':', '')
@@ -33,8 +31,9 @@ with open(regions_file, 'r') as f:
         full_regions += region + ' '
         allele_regions[gene] = region
 
-#File for biobambam
-#Changes depending on input format
+
+# File for biobambam
+# Changes depending on input format
 bambam_format = Path(aligned_file).suffix[1:]
 if bambam_format == "cram":
     bambam_file = f"temp/{sample}/{sample}_original.bam"
@@ -49,17 +48,21 @@ rule all:
         fq2 = expand(f"results/{patient}/seqs/{sample}/{sample}_" + "{gene}_2.fq", gene = genes),
         bam = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_grch38_plus.bam", gene = genes)
 
+# step 1 (optional): convert cram to bam
+# this is required because bamtofastq breaks on some cram files
+# TODO: support paired FASTQ file as input
 rule cram_to_bam:
     input:
         cram = aligned_file,
-        ref = original_reference
+        cram_reference = cram_reference
     output:
         bam = temp(f"temp/{sample}/{sample}_original.bam")
-    threads: threads
+    threads: NCORES
     shell:
-        "samtools view -hb -@ {threads} --reference {input.ref} {input.cram} > {output.bam}"
+        "samtools view -hb -@ {threads} --reference {input.cram_reference} {input.cram} > {output.bam}"
 
-#Checkpoints used for dynamic output - we don't know how many pieces it will split into ahead of time
+# step 2: convert bam to fastq
+# Checkpoints used for dynamic output - we don't know how many pieces it will split into ahead of time
 checkpoint unalign_reads_from_original:
     input:
         infile = bambam_file
@@ -75,7 +78,7 @@ checkpoint unalign_reads_from_original:
     shell:
         """
         mkdir -p {params.out_dir}
-        /home/mumphrey/Projects/hla_pipeline/bin/biobambam2/bin/bamtofastq \
+        bamtofastq \
             collate=1 \
             exclude=QCFAIL,SECONDARY,SUPPLEMENTARY \
             filename={input.infile} \
@@ -89,9 +92,11 @@ checkpoint unalign_reads_from_original:
             O2={params.orphan2}
         """
 
-#Uses kmer extraction to try to grab all HLA reads
-#Nearly 100% sensitivity, but low specificity
-#First pass extraction to save on compute time when doing bwa-postalt
+# step 3: extract fq files that match HLA gene kmers
+# Uses kmer extraction to try to grab all gene reads
+# Nearly 100% sensitivity, but low specificity
+# First pass extraction to save on compute time when doing bwa-postalt
+# this runs in parallel for 10M unaligned chunks 
 rule kmer_extraction:
     input:
         fq1 = f"temp/bambamtemps/{sample}/{sample}_original_1.fq_{{n}}",
@@ -102,7 +107,7 @@ rule kmer_extraction:
     threads: 1
     shell:
         """
-        /home/mumphrey/Projects/hla_pipeline/bin/hpseq/hpscan_cw \
+        hpscan_cw \
             -s {kmers} \
             -1 {output.fq1_extracted} \
             -2 {output.fq2_extracted} \
@@ -127,6 +132,8 @@ rule aggregate_kmer_extracted:
         cat {input.infiles} > {output.full_fq}
         """
 
+# step 4: realign reads to the complete reference that contains
+# all haplotypes, and perform postalt expansion
 rule realign_reads_to_alt_ref:
     input:
         fq1 = f"temp/{sample}/{sample}_extracted_1.fq",
@@ -135,10 +142,10 @@ rule realign_reads_to_alt_ref:
         bam = temp(f"temp/{sample}/{sample}_alt_aligned.bam")
     params:
         read_group = f"@RG\\tSM:{sample}\\tID:{sample}\\tPL:ILLUMINA\\tLB:{sample}"
-    threads: threads
+    threads: NCORES
     shell:
         """
-        bwa mem -t {threads} {reference} {input.fq1} {input.fq2} -R "{params.read_group}" | \
+        bwa mem -t {threads} {complete_reference} {input.fq1} {input.fq2} -R "{params.read_group}" | \
             samtools sort -@ {threads} |
             samtools view -@ {threads} -hb > {output.bam}
         """
@@ -149,17 +156,20 @@ rule bwa_postalt:
     output:
         out_bam=temp(f'temp/{sample}/{sample}_postalt.bam'),
         out_bai=temp(f'temp/{sample}/{sample}_postalt.bam.bai')
+    threads: NCORES        
     shell:
         """
         samtools view -h {input.in_bam} |
-        /home/mumphrey/Projects/hla_pipeline/bin/bwa.kit/k8 /home/mumphrey/Projects/hla_pipeline/bin/bwa.kit/bwa-postalt.js {alt_reference} |
+        k8 {PD}/bin/bwa-postalt.js {complete_reference_alt} |
         samtools view -hb |
-        samtools sort -o {output.out_bam}
-        samtools index {output.out_bam}
+        samtools sort -@ {threads} -o {output.out_bam}
+        samtools index -@ {threads} {output.out_bam}
         """
 
-#Extracting from postalt gives high sensitivity and high specificity
-#for HLA reads, but still leaves some reads that map to pseudogenes and highly similar blacklist genes
+# step 5: restrict reads to predefine regions
+# Extracting from postalt gives high sensitivity and high specificity, but still
+# leaves some reads that map to pseudogenes and highly similar blacklist genes
+# these reads are further cleanuped
 rule extract_all_gene_regions:
     input:
         in_bam = rules.bwa_postalt.output.out_bam,
@@ -172,6 +182,9 @@ rule extract_all_gene_regions:
         samtools sort -n -o {output.out_bam}
         """
 
+# step 6: manual bamtofastq
+# bwa-postalt.js creates many duplicate entries, and disrupts SAM
+# flags so we have to extract pairs manually
 rule unalign_reads_from_alt:
     input:
         in_bam = rules.extract_all_gene_regions.output.out_bam
@@ -182,9 +195,6 @@ rule unalign_reads_from_alt:
     run:
         bam = pysam.AlignmentFile(input.in_bam, 'rb')
         paired_bam = pysam.AlignmentFile(output.out_bam, 'wb', template=bam)
-
-        #bwa-postalt.js creates many duplicate entries, and disrupts SAM
-        #flags so we have to extract pairs manually
         pair = [False, False]
         cur_read = ''
         for read in bam:
@@ -202,26 +212,28 @@ rule unalign_reads_from_alt:
         paired_bam.close()
         subprocess.call(['bedtools', 'bamtofastq', '-i', output.out_bam, '-fq', output.fq1, '-fq2', output.fq2])
 
-#Blacklist contains pseudogenes and highly similar genes that we aren't interested in
+# step 7: remove reads which have a primary alignment to a blacklist gene
+# Blacklist contains pseudogenes and highly similar genes that we aren't interested in
 rule remove_blacklisted:
     input:
         fq1 = rules.unalign_reads_from_alt.output.fq1,
         fq2 = rules.unalign_reads_from_alt.output.fq2,
-        extraction_ref = extraction_reference
+        extraction_reference = extraction_reference
     output:
         extracted_sorted_bam = temp(f"temp/{sample}/{sample}_gene_extracted.bam"),
         extracted_sorted_bai = temp(f"temp/{sample}/{sample}_gene_extracted.bam.bai"),
         no_blacklist_bam = temp(f"temp/{sample}/{sample}_extracted_no_blacklist.bam")
-    threads: threads
+    threads: NCORES
     shell:
         """
-        bwa mem -t {threads} {input.extraction_ref} {input.fq1} {input.fq2} | \
+        bwa mem -t {threads} {input.extraction_reference} {input.fq1} {input.fq2} | \
             samtools sort -@ {threads} > {output.extracted_sorted_bam}
         samtools index {output.extracted_sorted_bam}
         samtools view -hb -@ {threads} {output.extracted_sorted_bam} {full_regions} |
             samtools sort -@ {threads} -n > {output.no_blacklist_bam}
         """
-
+# bwa-postalt.js creates many duplicate entries, and disrupts SAM
+# flags so we have to extract pairs manually
 rule unalign_reads_from_extraction:
     input:
         in_bam = rules.remove_blacklisted.output.no_blacklist_bam
@@ -230,11 +242,9 @@ rule unalign_reads_from_extraction:
         fq1 = temp(f"temp/{sample}/f_{sample}_extracted_no_blacklist_1.fq"),
         fq2 = temp(f"temp/{sample}/f_{sample}_extracted_no_blacklist_2.fq")
     run:
+        # TODO: turn this into a function and re-use with rule unalign_reads_from_alt
         bam = pysam.AlignmentFile(input.in_bam, 'rb')
         paired_bam = pysam.AlignmentFile(output.out_bam, 'wb', template=bam)
-
-        #bwa-postalt.js creates many duplicate entries, and disrupts SAM
-        #flags so we have to extract pairs manually
         pair = [False, False]
         cur_read = ''
         for read in bam:
@@ -260,10 +270,10 @@ rule align_to_alt_ref_final:
         bam = temp(f"temp/{sample}/f_{sample}_alt_aligned_final.bam")
     params:
         read_group = f"@RG\\tSM:{sample}\\tID:{sample}\\tPL:ILLUMINA\\tLB:{sample}"
-    threads: threads
+    threads: NCORES
     shell:
         """
-        bwa mem -t {threads} {reference} {input.fq1} {input.fq2} -R "{params.read_group}" | \
+        bwa mem -t {threads} {complete_reference} {input.fq1} {input.fq2} -R "{params.read_group}" | \
             samtools sort -@ {threads} |
             samtools view -@ {threads} -hb > {output.bam}
         """
@@ -277,7 +287,7 @@ rule bwa_postalt_final:
     shell:
         """
         samtools view -h {input.in_bam} |
-        /home/mumphrey/Projects/hla_pipeline/bin/bwa.kit/k8 /home/mumphrey/Projects/hla_pipeline/bin/bwa.kit/bwa-postalt.js {alt_reference} |
+        k8 {PD}/bin/bwa-postalt.js {complete_reference_alt} |
         samtools view -hb |
         samtools sort -o {output.out_bam}
         samtools index {output.out_bam}
@@ -305,11 +315,9 @@ rule unalign_reads:
         fq1 = f"results/{patient}/seqs/{sample}/{sample}_{{gene}}_1.fq",
         fq2 = f"results/{patient}/seqs/{sample}/{sample}_{{gene}}_2.fq"
     run:
+        # TODO: turn this into a function and re-use with rule unalign_reads_from_alt
         bam = pysam.AlignmentFile(input.in_bam, 'rb')
         paired_bam = pysam.AlignmentFile(output.out_bam, 'wb', template=bam)
-
-        #bwa-postalt.js creates many duplicate entries, and disrupts SAM
-        #flags so we have to extract pairs manually
         pair = [False, False]
         cur_read = ''
         for read in bam:
