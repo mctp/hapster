@@ -25,7 +25,7 @@ PATH=$PWD/bin:$PATH
 
 ### Setup External Dependencies
 
-Polytect depends on a number of dependencies managed by conda and select one which are not GATK4, hpseq, biobambam2 and bwa.kit.
+Polytect depends on a number of dependencies managed by conda and select ones which are not: GATK4, hpseq, biobambam2 and bwa.kit.
 
 - bwa.kit (==0.7.15) No other version supported.
   (https://sourceforge.net/projects/bio-bwa/files/bwakit/)  
