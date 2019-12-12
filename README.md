@@ -40,7 +40,7 @@ These dependencies are included in the provided tools resources bundle.
 
 ```bash
 wget https://storage.googleapis.com/mctp-open-share/polytect/tools-1.0.0.tar.gz --directory-prefix=resources
-polytect setup_tools
+polytect hs-hg38-hla setup_tools
 ```
 
 ### Setup references
@@ -48,7 +48,7 @@ polytect setup_tools
 ```bash
 conda activate polytect
 wget https://storage.googleapis.com/mctp-open-share/polytect/hs-hg38-1.0.0.tar.gz --directory-prefix=resources
-polytect make_refs
+polytect hs-hg38-hla make_refs
 ```
 
 ## Running
