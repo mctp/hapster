@@ -83,8 +83,8 @@ rule sim_reads:
         randomreads.sh \
             ref=../{input.sim_fasta} \
             reads={n_reads} \
-            minlength={min_length} \
-            maxlength={max_length} \
+            minlength={min_insert_length} \
+            maxlength={max_insert_length} \
             out=../{output.insert_fastq}
         cd ../
         rm -r {wildcards.allele}
@@ -105,7 +105,7 @@ rule sim_exome_capture:
             {output.exome_fq1} \
             {output.exome_fq2} \
             {similarity} \
-            {length}
+            {read_length}
         """
 
 rule remove_ignored:
