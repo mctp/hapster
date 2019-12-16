@@ -23,13 +23,13 @@ nm = config['nm']
 
 # polytect global references
 genes = config['genes']
-fasta_files = {gene: PD / config['gene_prefix'] / "alts" / f"{gene}.fa" for gene in genes}
-regions = PD / config['gene_prefix'] / "sim" / "regions.txt"
-base_fasta = PD / config['gene_prefix'] / "sim" / "base.fa"
-complete_reference = PD / config['gene_prefix'] / "fa" / "complete.fa"
-complete_reference_alt = PD / config['gene_prefix'] / "fa" / "complete.fa.alt"
-extraction_reference = PD / config['gene_prefix'] / "fa" / "extraction.fa"
-extraction_reference_alt = PD / config['gene_prefix'] / "fa" / "extraction.fa.alt"
+fasta_files = {gene: str(PD / config['gene_prefix'] / "alts" / f"{gene}.fa") for gene in genes}
+regions = str(PD / config['gene_prefix'] / "sim" / "regions.txt")
+base_fasta = str(PD / config['gene_prefix'] / "sim" / "base.fa")
+complete_reference = str(PD / config['gene_prefix'] / "fa" / "complete.fa")
+complete_reference_alt = str(PD / config['gene_prefix'] / "fa" / "complete.fa.alt")
+extraction_reference = str(PD / config['gene_prefix'] / "fa" / "extraction.fa")
+extraction_reference_alt = str(PD / config['gene_prefix'] / "fa" / "extraction.fa.alt")
 
 # derived variables
 full_regions = ""
