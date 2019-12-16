@@ -141,7 +141,7 @@ rule remove_ignored:
             O={output.orphan1} \
             O2={output.orphan2}
         bwa mem {input.full_ref} {output.fq1} {output.fq2} | \
-            ./bin/bwa.kit/k8 ./bin/bwa.kit/bwa-postalt.js {complete_reference_alt} | \
+            ./bin/k8 ./bin/bwa-postalt.js {complete_reference_alt} | \
             samtools view -hb | \
             samtools sort -n -o {output.out_bam}
         """
