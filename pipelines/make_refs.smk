@@ -15,8 +15,8 @@ genes = config['genes']
 gff_files = {}
 fasta_files = {}
 for gene in genes:
-    gff_files[gene] = "%s/gff/%s.gff" % (gene_prefix, gene)
-    fasta_files[gene] = "%s/alts/%s.fa" % (gene_prefix, gene)
+    gff_files[gene] = f"{gene_prefix}/gff/{gene}.gff"
+    fasta_files[gene] = f"{gene_prefix}/alts/{gene}.fa" % (gene_prefix, gene)
 blacklist_fasta = Path(gene_prefix) / "alts" / "blacklist.fa"
 
 rule all:
