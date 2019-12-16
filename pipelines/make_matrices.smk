@@ -130,7 +130,7 @@ rule remove_ignored:
             samtools sort > {output.extracted_sorted_bam}
         samtools index {output.extracted_sorted_bam}
         samtools view -hb {output.extracted_sorted_bam} {full_regions} > {output.no_ignored_bam}
-        ./bin/biobambam2/bin/bamtofastq \
+        ./bin/biobambam2/x86_64-linux-gnu/2.0.146/bin/bamtofastq \
             collate=1 \
             filename={output.no_ignored_bam} \
             gz=0 \
