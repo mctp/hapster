@@ -17,8 +17,10 @@ Commands:
            args:	    [gene]     
   make_matrices:	Similate haplotyping matrices
            args:	    [gene] [capture_targets] [min_insert_length] [max_insert_length] [similarity] [read_length] [n_reads] [nm]
-   extract_reads	Extract reads for polymorphic gene
+   extract_reads	Extract reads for polymorphic genes
            args:        [gene] [patient] [sample] [aligned_file] <cram_reference>
+infer_haplotype:    Infers haplotype for polymorphic genes
+           args:        [gene] [patient] [sample] [nm]
   *	   Help
 "
   exit 1
@@ -65,6 +67,18 @@ case "$1" in
                      n_reads=$8 \
                      nm=$9 \
             --snakefile $POLYTECT_DIR/pipelines/make_matrices.smk \
+            --directory $PWD \
+            --cores $NCORES
+    ;;
+    infer_haplotype)
+        snakemake \
+            --configfile $POLYTECT_DIR/config/$2.yaml \
+            --config POLYTECT_DIR=$POLYTECT_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     nm=$5 \
+            --snakefile $POLYTECT_DIR/pipelines/infer_haplotype.smk \
             --directory $PWD \
             --cores $NCORES
     ;;
