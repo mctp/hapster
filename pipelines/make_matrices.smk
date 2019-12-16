@@ -43,7 +43,6 @@ with open(regions, 'r') as f:
 allele_ids = {gene:[record.id for record in SeqIO.parse(fasta, 'fasta')] for gene, fasta in fasta_files.items()}
 allele_filenames = {k:[f"{re.sub('[^0-9a-zA-Z]+', '_', x)}" for x in v] for k, v in allele_ids.items()}
 faidx_id = {k:{f"{re.sub('[^0-9a-zA-Z]+', '_', x)}":x for x in v} for k, v in allele_ids.items()}
-#allele_filenames = allele_filenames['A']
 
 rule all:
     input:
@@ -56,7 +55,7 @@ rule all:
 rule make_fasta:
     input:
         b_fasta = base_fasta,
-        alt_fasta = f"refs/alts/{{gene}}.fa"
+        alt_fasta = f"{str(PD)}/{config["gene_prefix"]}/alts/{{gene}}.fa"
     output:
         sim_fasta = temp(f"temp/sim/{{gene}}/{{allele}}_sim.fa")
     params:
