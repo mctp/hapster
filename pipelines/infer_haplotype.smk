@@ -15,7 +15,7 @@ nm = config['nm']
 # polytect global references
 genes = config['genes']
 fasta_files = {gene: str(PD / config['gene_prefix'] / "alts" / f"{gene}.fa") for gene in genes}
-bams = {gene: str(PD / "results" / patient / sample / "alignments" / f"{sample}_{gene}_complete.bam") for gene in genes}
+bams = {gene: str(PD / "results" / patient / "alignments" / sample / f"{sample}_{gene}_complete.bam") for gene in genes}
 gene_cor_cutoffs = config['gene_cor_cutoffs']
 likelihood_files = {gene: str(PD / config['gene_prefix'] / "matrices" / f"{gene}_likelihoods.csv") for gene in genes}
 
