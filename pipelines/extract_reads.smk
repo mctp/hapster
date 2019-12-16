@@ -5,6 +5,7 @@ from pathlib import Path
 # polytect runtime
 PD = Path(config['POLYTECT_DIR'])
 NCORES = config['NCORES']
+
 # inputs
 patient = config['patient']
 sample = config['sample']
