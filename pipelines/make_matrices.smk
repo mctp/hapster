@@ -208,11 +208,11 @@ rule consolidate_counts:
     input:
         in_counts = lambda w: expand("temp/sim/{{gene}}/{allele}_counts.txt", allele = allele_filenames[w.gene])
     output:
-        matrix = PD / config["gene_prefix"] / "matrices" / f"{{gene}}_likelihoods.csv"
+        matrix_raw = temp(f"temp/matrices/{{gene}}_likelihoods.csv")
     params:
         allele_ids = lambda w: allele_ids[w.gene]
     run:
-        with open(output.matrix, 'w') as of:
+        with open(output.matrix_raw, 'w') as of:
             for name in params.allele_ids:
                 of.write(f",{name}",)
             of.write('\n')
@@ -220,3 +220,11 @@ rule consolidate_counts:
                 with open(filename, 'r') as f:
                     for line in f:
                         of.write(f"{line}\n")
+
+rule make_symmetrical:
+    input:
+        matrix_raw = rules.consolidate_counts.output.matrix_raw
+    output:
+        matrix = PD / config["gene_prefix"] / "matrices" / f"{{gene}}_likelihoods.csv"
+    script:
+        "scripts/make_symmetrical.R"
