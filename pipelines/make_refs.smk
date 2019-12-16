@@ -21,32 +21,23 @@ blacklist_fasta = Path(gene_prefix) / "alts" / "blacklist.fa"
 
 rule all:
     input:
+        expand("{gene_prefix}/alts/{gene}.fa.fai", gene_prefix=gene_prefix, gene=genes),
         expand("{gene_prefix}/sim/kmers.txt", gene_prefix=gene_prefix),
         expand("{gene_prefix}/sim/regions.txt", gene_prefix=gene_prefix),
         expand("{gene_prefix}/gff/alt_genes.gff", gene_prefix=gene_prefix),
         expand("{gene_prefix}/fa/extraction.fa", gene_prefix=gene_prefix),
-        # expand("build/refs/finished_single_refs_{gene}.txt", gene = genes),
         expand("{gene_prefix}/fa/complete.fa", gene_prefix=gene_prefix),
         expand("{gene_prefix}/fa/complete.fa.alt", gene_prefix=gene_prefix)
 
-# Makes each record its own fasta to provide easy access when generating
-# germline refs later. Probably better to eventually just use a fasta index
-# for the original fastas rather than writing so many files.
-rule make_single_refs:
+rule index_fastas:
     input:
-        fasta = lambda w: fasta_files[w.gene]
+        fasta = f"{gene_prefix}/alts/{{gene}}.fa"
     output:
-        finished = temp("build/refs/finished_single_refs_{gene}.txt")
-    run:
-        output_dir = Path(gene_prefix) / "fa/single_refs"
-        output_dir.mkdir(parents=True, exist_ok=True)
-        for record in SeqIO.parse(input.fasta, "fasta"):
-            seq_filename = output_dir / (re.sub('[^0-9a-zA-Z]+', '_', record.id) + ".fa")
-            with open(seq_filename, 'w') as of:
-                of.write(f">{record.id}\n")
-                of.write(f"{str(record.seq)}\n")
-        with open(output.finished, 'w') as of:
-            pass
+        faidx = f"{gene_prefix}/alts/{{gene}}.fa.fai"
+    shell:
+        """
+        samtools faidx {input.fasta}
+        """
 
 # Makes a list of regions for each gene that captures all nucleotides of all alleles
 # Used later with samtools to extract reads across all alleles for a given gene
