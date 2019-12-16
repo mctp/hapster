@@ -58,7 +58,7 @@ rule make_fasta:
         b_fasta = base_fasta,
         alt_fasta = f"refs/alts/{{gene}}.fa"
     output:
-        sim_fasta = temp(f"temp/sim/{{allele}}_sim.fa")
+        sim_fasta = temp(f"temp/sim/{{gene}}/{{allele}}_sim.fa")
     params:
         faidx_id = lambda w: faidx_id[w.gene][w.allele]
     shell:
@@ -75,7 +75,7 @@ rule sim_reads:
     input:
         sim_fasta = rules.make_fasta.output.sim_fasta
     output:
-        insert_fastq = temp(f"temp/sim/{{allele}}_inserts.fq")
+        insert_fastq = temp(f"temp/sim/{{gene}}/{{allele}}_inserts.fq")
     threads: 1
     shell:
         """
@@ -96,8 +96,8 @@ rule sim_exome_capture:
         capture_targets = capture_targets,
         insert_fastq = rules.sim_reads.output.insert_fastq
     output:
-        exome_fq1 = temp(f"temp/sim/{{allele}}_reads.fq1"),
-        exome_fq2 = temp(f"temp/sim/{{allele}}_reads.fq2")
+        exome_fq1 = temp(f"temp/sim/{{gene}}/{{allele}}_reads.fq1"),
+        exome_fq2 = temp(f"temp/sim/{{gene}}/{{allele}}_reads.fq2")
     shell:
         """
         python scripts/targeted_enrichment.py \
@@ -116,15 +116,15 @@ rule remove_ignored:
         extraction_ref = extraction_reference,
         full_ref = complete_reference
     output:
-        extracted_sorted_bam = temp(f"temp/sim/{{allele}}_extracted_sorted.bam"),
-        extracted_sorted_bai = temp(f"temp/sim/{{allele}}_extracted_sorted.bam.bai"),
-        no_ignored_bam = temp(f"temp/sim/{{allele}}_extracted_no_ignored.bam"),
-        out_bam = temp(f"temp/sim/{{allele}}_postalt_no_ignored.bam"),
-        fq1 = temp(f"temp/sim/{{allele}}_1_2.fq"),
-        fq2 = temp(f"temp/sim/{{allele}}_2_2.fq"),
-        singles = temp(f"temp/sim/{{allele}}_singles_2.fq"),
-        orphan1 = temp(f"temp/sim/{{allele}}_orphans_1_2.fq"),
-        orphan2 = temp(f"temp/sim/{{allele}}_orphans_2_2.fq")
+        extracted_sorted_bam = temp(f"temp/sim/{{gene}}/{{allele}}_extracted_sorted.bam"),
+        extracted_sorted_bai = temp(f"temp/sim/{{gene}}/{{allele}}_extracted_sorted.bam.bai"),
+        no_ignored_bam = temp(f"temp/sim/{{gene}}/{{allele}}_extracted_no_ignored.bam"),
+        out_bam = temp(f"temp/sim/{{gene}}/{{allele}}_postalt_no_ignored.bam"),
+        fq1 = temp(f"temp/sim/{{gene}}/{{allele}}_1_2.fq"),
+        fq2 = temp(f"temp/sim/{{gene}}/{{allele}}_2_2.fq"),
+        singles = temp(f"temp/sim/{{gene}}/{{allele}}_singles_2.fq"),
+        orphan1 = temp(f"temp/sim/{{gene}}/{{allele}}_orphans_1_2.fq"),
+        orphan2 = temp(f"temp/sim/{{gene}}/{{allele}}_orphans_2_2.fq")
     shell:
         """
         bwa mem {input.extraction_ref} {input.fq1} {input.fq2} | \
