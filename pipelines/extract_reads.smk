@@ -46,7 +46,7 @@ rule all:
         bam_for_kmer_filter = f"results/{patient}/alignments/{sample}/{sample}_extracted_with_blacklist.bam",
         fq1 = expand(f"results/{patient}/seqs/{sample}/{sample}_" + "{gene}_1.fq", gene = genes),
         fq2 = expand(f"results/{patient}/seqs/{sample}/{sample}_" + "{gene}_2.fq", gene = genes),
-        bam = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_grch38_plus.bam", gene = genes)
+        bam = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_complete.bam", gene = genes)
 
 # step 1 (optional): convert cram to bam
 # this is required because bamtofastq breaks on some cram files
@@ -298,7 +298,7 @@ rule extract_single_gene_region:
         in_bam = rules.bwa_postalt_final.output.out_bam,
         in_bai = rules.bwa_postalt_final.output.out_bai
     output:
-        out_bam = f"results/{patient}/alignments/{sample}/{sample}_{{gene}}_grch38_plus.bam"
+        out_bam = f"results/{patient}/alignments/{sample}/{sample}_{{gene}}_complete.bam"
     params:
         regions = lambda w: allele_regions[w.gene]
     shell:
