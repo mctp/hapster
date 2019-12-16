@@ -42,6 +42,7 @@ with open(regions, 'r') as f:
 
 allele_ids = {gene:[record.id for record in SeqIO.parse(fasta, 'fasta')] for gene, fasta in fasta_files.items()}
 allele_filenames = {k:[f"{re.sub('[^0-9a-zA-Z]+', '_', x)}" for x in v] for k, v in allele_ids.items()}
+faidx_id = {k:{f"{re.sub('[^0-9a-zA-Z]+', '_', x)}":x for x in v} for k, v in allele_ids.items()}
 #allele_filenames = allele_filenames['A']
 
 rule all:
@@ -55,13 +56,15 @@ rule all:
 rule make_fasta:
     input:
         b_fasta = base_fasta,
-        single_fasta = f"refs/single_refs/{{allele}}.fa"
+        alt_fasta = f"refs/alts/{{gene}}.fa"
     output:
         sim_fasta = temp(f"temp/sim/{{allele}}_sim.fa")
+    params:
+        faidx_id = lambda w: faidx_id[w.gene][w.allele]
     shell:
         """
         cp {input.b_fasta} {output.sim_fasta}
-        cat {input.single_fasta} >> {output.sim_fasta}
+        samtools faidx {input.alt_fasta} {params.faidx_id} >> {output.sim_fasta}
         """
 
 #This rule simulates inserts with size based on the experimental
