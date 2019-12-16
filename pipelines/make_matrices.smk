@@ -23,7 +23,7 @@ nm = config['nm']
 
 # polytect global references
 genes = config['genes']
-fasta_files = [PD / config['gene_prefix'] / "alts" / f"{gene}.fa" for gene in genes]
+fasta_files = {gene: PD / config['gene_prefix'] / "alts" / f"{gene}.fa" for gene in genes}
 regions = PD / config['gene_prefix'] / "sim" / "regions.txt"
 base_fasta = PD / config['gene_prefix'] / "sim" / "base.fa"
 complete_reference = PD / config['gene_prefix'] / "fa" / "complete.fa"
