@@ -25,6 +25,11 @@ Commands:
 }
 
 case "$1" in
+    setup_tools)
+        TOOLS_VER=1.0.0 ## TODO: refactor or remove versioning
+        tar -xvf $POLYTECT_DIR/resources/tools-$TOOLS_VER.tar.gz -C $POLYTECT_DIR/build
+        bash $POLYTECT_DIR/build/tools-$TOOLS_VER/setup-tools.sh
+        ;;
     hs-hg38-hla)
     ;;
     help|"")
@@ -38,11 +43,6 @@ esac
 
 
 case "$2" in
-    setup_tools)
-        TOOLS_VER=1.0.0 ## TODO: refactor or remove versioning
-        tar -xvf $POLYTECT_DIR/resources/tools-$TOOLS_VER.tar.gz -C $POLYTECT_DIR/build
-        bash $POLYTECT_DIR/build/tools-$TOOLS_VER/setup-tools.sh
-        ;;
     make_refs)
         REFS_VER=1.0.0 ## TODO: refactor or remove versioning
         tar --strip 1 -xf $POLYTECT_DIR/resources/hs-hg38-$REFS_VER.tar.gz -C $POLYTECT_DIR/refs

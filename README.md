@@ -40,7 +40,7 @@ These dependencies are included in the provided tools resources bundle.
 
 ```bash
 wget https://storage.googleapis.com/mctp-open-share/polytect/tools-1.0.0.tar.gz --directory-prefix=resources
-polytect hs-hg38-hla setup_tools
+polytect setup_tools
 ```
 
 ### Setup references
