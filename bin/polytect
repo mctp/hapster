@@ -15,8 +15,8 @@ Commands:
            args:	
        make_refs	Make all required reference files
            args:	    [gene]     
-       make_mats	Similate haplotyping matrices
-           args:	    [gene] <capture_targets>
+  make_matrices:	Similate haplotyping matrices
+           args:	    [gene] [capture_targets] [min_insert_length] [max_insert_length] [similarity] [read_length] [n_reads] [nm]
    extract_reads	Extract reads for polymorphic gene
            args:        [gene] [patient] [sample] [aligned_file] <cram_reference>
   *	   Help
@@ -52,6 +52,22 @@ case "$1" in
             --directory $PWD \
             --cores $NCORES
         ;;
+    make_matrices)
+        snakemake \
+            --configfile $POLYTECT_DIR/config/$2.yaml \
+            --config POLYTECT_DIR=$POLYTECT_DIR \
+                     NCORES=$NCORES \
+                     capture_targets=$3 \
+                     min_insert_length=$4 \
+                     max_insert_length=$5 \
+                     similarity=$6 \
+                     read_length=$7 \
+                     n_reads=$8 \
+                     nm=$9 \
+            --snakefile $POLYTECT_DIR/pipelines/make_matrices.smk \
+            --directory $PWD \
+            --cores $NCORES
+    ;;
     help|"")
         cli_help
         ;;
