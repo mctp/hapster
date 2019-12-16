@@ -51,6 +51,7 @@ rule create_regions_list:
 
 rule make_haplotype_ref:
     input:
+        fa = lambda w: fasta_files[w.gene],
         haplotype = haplotype
     output:
         hap_fa = temp(f"temp/{sample}/{sample}_{{gene}}.fa"),
