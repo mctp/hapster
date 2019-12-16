@@ -24,7 +24,7 @@ rule all:
         expand("{gene_prefix}/sim/kmers.txt", gene_prefix=gene_prefix),
         expand("{gene_prefix}/sim/regions.txt", gene_prefix=gene_prefix),
         expand("{gene_prefix}/gff/alt_genes.gff", gene_prefix=gene_prefix),
-        # expand("{gene_prefix}/fa/extraction.fa", gene_prefix=gene_prefix),
+        expand("{gene_prefix}/fa/extraction.fa", gene_prefix=gene_prefix),
         # expand("build/refs/finished_single_refs_{gene}.txt", gene = genes),
         expand("{gene_prefix}/fa/complete.fa", gene_prefix=gene_prefix),
         expand("{gene_prefix}/fa/complete.fa.alt", gene_prefix=gene_prefix)
@@ -74,7 +74,7 @@ rule consolidate_gffs:
         cat {input.gffs} >> {output.full_gff}
         """
 
-# Makes a single gff for later use with the somatic mutation consequence caller
+# Makes a single fasta for later use with the somatic mutation consequence caller
 rule consolidate_fastas:
     input:
         fasta_files = [x for x in fasta_files.values()]
