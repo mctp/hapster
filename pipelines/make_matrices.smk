@@ -55,7 +55,7 @@ rule all:
 rule make_fasta:
     input:
         b_fasta = base_fasta,
-        alt_fasta = f"{str(PD)}/{config["gene_prefix"]}/alts/{{gene}}.fa"
+        alt_fasta = PD / config["gene_prefix"] / "alts" / f"{{gene}}.fa"
     output:
         sim_fasta = temp(f"temp/sim/{{gene}}/{{allele}}_sim.fa")
     params:
