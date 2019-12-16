@@ -47,7 +47,7 @@ faidx_id = {k:{f"{re.sub('[^0-9a-zA-Z]+', '_', x)}":x for x in v} for k, v in al
 rule all:
     input:
         #expand("temp/sim/{allele}_counts.txt", allele = allele_filenames),
-        expand("refs/matrices/{gene}_likelihoods.csv", gene = genes)
+        matrices = [PD / config["gene_prefix"] / "matrices" / f"{gene}_likelihoods.csv" for gene in genes]
 
 #Makes a fasta file for use for simming reads
 #This is where you can add pseudogenes to your real genes if you want
@@ -208,7 +208,7 @@ rule consolidate_counts:
     input:
         in_counts = lambda w: expand("temp/sim/{{gene}}/{allele}_counts.txt", allele = allele_filenames[w.gene])
     output:
-        matrix = f"refs/matrices/{{gene}}_likelihoods.csv"
+        matrix = PD / config["gene_prefix"] / "matrices" / f"{{gene}}_likelihoods.csv"
     params:
         allele_ids = lambda w: allele_ids[w.gene]
     run:
