@@ -23,6 +23,14 @@ cd polytect
 PATH=$PWD/bin:$PATH
 ```
 
+### Running
+
+Before you can use any of the polytect commands, you need to activate the Conda environment and setup path.
+
+```bash
+conda activate polytect
+```
+
 ### Setup External Dependencies
 
 Polytect depends on a number of dependencies managed by conda and select ones which are not: GATK4, hpseq, biobambam2 and bwa.kit.
@@ -49,12 +57,4 @@ polytect setup_tools
 conda activate polytect
 wget https://storage.googleapis.com/mctp-open-share/polytect/hs-hg38-1.0.0.tar.gz --directory-prefix=resources
 polytect make_refs hs-hg38-hla
-```
-
-## Running
-
-Before you can use any of the polytect commands, you need to activate the Conda environment and setup path.
-
-```bash
-conda activate polytect
 ```
