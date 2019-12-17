@@ -36,8 +36,6 @@ case "$1:${@: -1}" in
         bash $POLYTECT_DIR/build/tools-$TOOLS_VER/setup-tools.sh
     ;;
     make_refs:dryrun)
-        REFS_VER=1.0.1 ## TODO: refactor or remove versioning
-        tar --strip 1 -xf $POLYTECT_DIR/resources/hs-hg38-$REFS_VER.tar.gz -C $POLYTECT_DIR/refs --skip-old-files
         snakemake \
             --configfile $POLYTECT_DIR/config/$2.yaml \
             --snakefile $POLYTECT_DIR/pipelines/make_refs.smk \
@@ -46,8 +44,6 @@ case "$1:${@: -1}" in
             --dryrun
     ;;
     make_refs:*)
-        REFS_VER=1.0.1 ## TODO: refactor or remove versioning
-        tar --strip 1 -xf $POLYTECT_DIR/resources/hs-hg38-$REFS_VER.tar.gz -C $POLYTECT_DIR/refs --skip-old-files
         snakemake \
             --configfile $POLYTECT_DIR/config/$2.yaml \
             --snakefile $POLYTECT_DIR/pipelines/make_refs.smk \
