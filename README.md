@@ -9,6 +9,7 @@ Polytect is developed and tested on Ubuntu 18.04, but should work on modern Linu
 - Python 3.7
 - Miniconda3 (https://docs.conda.io/en/latest/miniconda.html)
 - gcc tool chain to compile programs
+- unzip
 
 ### Setup Polytect base directory
 
@@ -55,6 +56,6 @@ polytect setup_tools
 
 ```bash
 conda activate polytect
-wget https://storage.googleapis.com/mctp-open-share/polytect/hs-hg38-1.0.0.tar.gz --directory-prefix=resources
+wget https://storage.googleapis.com/mctp-open-share/polytect/hs-hg38-1.0.1.tar.gz --directory-prefix=resources
 polytect make_refs hs-hg38-hla
 ```
