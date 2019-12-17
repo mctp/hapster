@@ -14,27 +14,38 @@ Commands:
        setup_tools:	    Setup required tools
               args:	
          make_refs:	    Make all required reference files
-              args:	        [gene]     
+              args:	        [gene] <dryrun>  
      make_matrices:	    Similate haplotyping matrices
-              args:	        [gene] [capture_targets] [min_insert_length] [max_insert_length] [similarity] [read_length] [n_reads] [nm]
+              args:	        [gene] [capture_targets] [min_insert_length] [max_insert_length] [similarity] [read_length] [n_reads] [nm] <dryrun>
      extract_reads:	    Extract reads for polymorphic genes
-              args:         [gene] [patient] [sample] [aligned_file] <cram_reference>
+              args:         [gene] [patient] [sample] [aligned_file] <cram_reference> <dryrun>
    infer_haplotype:     Infers haplotype for polymorphic genes
-              args:         [gene] [patient] [sample] [nm]
+              args:         [gene] [patient] [sample] [nm] <dryrun>
 germline_mutations:     Calls germline mutations in polymorphic genes
-              args:         [gene] [patient] [sample] [haplotype]
+              args:         [gene] [patient] [sample] [haplotype] <dryrun>
   *	   Help
 "
   exit 1
 }
 
-case "$1" in
-    setup_tools)
+#${@: -1} checks trailing arg, used to look for dryrun tag
+case "$1:${@: -1}" in
+    setup_tools:*)
         TOOLS_VER=1.0.0 ## TODO: refactor or remove versioning
         tar -xvf $POLYTECT_DIR/resources/tools-$TOOLS_VER.tar.gz -C $POLYTECT_DIR/build --skip-old-files
         bash $POLYTECT_DIR/build/tools-$TOOLS_VER/setup-tools.sh
-        ;;
-    make_refs)
+    ;;
+    make_refs:dryrun)
+        REFS_VER=1.0.1 ## TODO: refactor or remove versioning
+        tar --strip 1 -xf $POLYTECT_DIR/resources/hs-hg38-$REFS_VER.tar.gz -C $POLYTECT_DIR/refs --skip-old-files
+        snakemake \
+            --configfile $POLYTECT_DIR/config/$2.yaml \
+            --snakefile $POLYTECT_DIR/pipelines/make_refs.smk \
+            --directory $POLYTECT_DIR \
+            --cores $NCORES \
+            --dryrun
+    ;;
+    make_refs:*)
         REFS_VER=1.0.1 ## TODO: refactor or remove versioning
         tar --strip 1 -xf $POLYTECT_DIR/resources/hs-hg38-$REFS_VER.tar.gz -C $POLYTECT_DIR/refs --skip-old-files
         snakemake \
@@ -42,8 +53,22 @@ case "$1" in
             --snakefile $POLYTECT_DIR/pipelines/make_refs.smk \
             --directory $POLYTECT_DIR \
             --cores $NCORES
-        ;;
-    extract_reads)
+    ;;
+    extract_reads:dryrun)
+        snakemake \
+            --configfile $POLYTECT_DIR/config/$2.yaml \
+            --config POLYTECT_DIR=$POLYTECT_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     aligned_file=$5 \
+                     cram_reference=$6 \
+            --snakefile $POLYTECT_DIR/pipelines/extract_reads.smk \
+            --directory $PWD \
+            --cores $NCORES \
+            --dryrun
+    ;;
+    extract_reads:*)
         snakemake \
             --configfile $POLYTECT_DIR/config/$2.yaml \
             --config POLYTECT_DIR=$POLYTECT_DIR \
@@ -55,8 +80,25 @@ case "$1" in
             --snakefile $POLYTECT_DIR/pipelines/extract_reads.smk \
             --directory $PWD \
             --cores $NCORES
-        ;;
-    make_matrices)
+    ;;
+    make_matrices:dryrun)
+        snakemake \
+            --configfile $POLYTECT_DIR/config/$2.yaml \
+            --config POLYTECT_DIR=$POLYTECT_DIR \
+                     NCORES=$NCORES \
+                     capture_targets=$3 \
+                     min_insert_length=$4 \
+                     max_insert_length=$5 \
+                     similarity=$6 \
+                     read_length=$7 \
+                     n_reads=$8 \
+                     nm=$9 \
+            --snakefile $POLYTECT_DIR/pipelines/make_matrices.smk \
+            --directory $PWD \
+            --cores $NCORES \
+            --dryrun
+    ;;
+    make_matrices:*)
         snakemake \
             --configfile $POLYTECT_DIR/config/$2.yaml \
             --config POLYTECT_DIR=$POLYTECT_DIR \
@@ -72,7 +114,20 @@ case "$1" in
             --directory $PWD \
             --cores $NCORES
     ;;
-    infer_haplotype)
+    infer_haplotype:dryrun)
+        snakemake \
+            --configfile $POLYTECT_DIR/config/$2.yaml \
+            --config POLYTECT_DIR=$POLYTECT_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     nm=$5 \
+            --snakefile $POLYTECT_DIR/pipelines/infer_haplotype.smk \
+            --directory $PWD \
+            --cores $NCORES \
+            --dryrun
+    ;;
+    infer_haplotype:*)
         snakemake \
             --configfile $POLYTECT_DIR/config/$2.yaml \
             --config POLYTECT_DIR=$POLYTECT_DIR \
@@ -84,7 +139,20 @@ case "$1" in
             --directory $PWD \
             --cores $NCORES
     ;;
-    germline_mutations)
+    germline_mutations:dryrun)
+        snakemake \
+            --configfile $POLYTECT_DIR/config/$2.yaml \
+            --config POLYTECT_DIR=$POLYTECT_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     haplotype=$5 \
+            --snakefile $POLYTECT_DIR/pipelines/call_germline_mutations.smk \
+            --directory $PWD \
+            --cores $NCORES \
+            --dryrun
+    ;;
+    germline_mutations:*)
         snakemake \
             --configfile $POLYTECT_DIR/config/$2.yaml \
             --config POLYTECT_DIR=$POLYTECT_DIR \
@@ -96,11 +164,11 @@ case "$1" in
             --directory $PWD \
             --cores $NCORES
     ;;
-    help|"")
+    help|"":*)
         cli_help
-        ;;
+    ;;
     *)
         echo -e "Command not supported.\n"
         cli_help
-        ;;
+    ;;
 esac
