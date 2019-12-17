@@ -160,6 +160,35 @@ case "$1:${@: -1}" in
             --directory $PWD \
             --cores $NCORES
     ;;
+    tune_parameters:dryrun)
+        snakemake \
+            --configfile $POLYTECT_DIR/config/$2.yaml \
+            --config POLYTECT_DIR=$POLYTECT_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     aligned_file=$5 \
+                     cram_reference=$6 \
+                     nm=$7 \
+            --snakefile $POLYTECT_DIR/pipelines/tune_parameters.smk \
+            --directory $PWD \
+            --cores $NCORES \
+            --dryrun -p
+    ;;
+    tune_parameters:*)
+        snakemake \
+            --configfile $POLYTECT_DIR/config/$2.yaml \
+            --config POLYTECT_DIR=$POLYTECT_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     aligned_file=$5 \
+                     cram_reference=$6 \
+                     nm=$7 \
+            --snakefile $POLYTECT_DIR/pipelines/tune_parameters.smk \
+            --directory $PWD \
+            --cores $NCORES
+    ;;
     help|"":*)
         cli_help
     ;;
