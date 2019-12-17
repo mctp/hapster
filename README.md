@@ -56,6 +56,6 @@ polytect setup_tools
 
 ```bash
 conda activate polytect
-wget https://storage.googleapis.com/mctp-open-share/polytect/hs-hg38-1.0.0.tar.gz --directory-prefix=resources
+wget https://storage.googleapis.com/mctp-open-share/polytect/hs-hg38-1.0.1.tar.gz --directory-prefix=resources
 polytect make_refs hs-hg38-hla
 ```
