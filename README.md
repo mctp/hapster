@@ -9,6 +9,7 @@ Polytect is developed and tested on Ubuntu 18.04, but should work on modern Linu
 - Python 3.7
 - Miniconda3 (https://docs.conda.io/en/latest/miniconda.html)
 - gcc tool chain to compile programs
+- unzip
 
 ### Setup Polytect base directory
 
