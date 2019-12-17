@@ -227,4 +227,4 @@ rule make_symmetrical:
     output:
         matrix = PD / config["gene_prefix"] / "matrices" / f"{{gene}}_likelihoods.csv"
     script:
-        "scripts/make_symmetrical.R"
+        "../scripts/make_symmetrical.R"
