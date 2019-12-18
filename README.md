@@ -87,6 +87,7 @@ To improve run time for later parts of the algorithm, we extract reads specific 
  - aligned_file: filepath to alignment we are extracting reads from
  - cram_reference: filepath to reference used to generate a cram file, only required if extracting reads from a .cram file
 
+This module expects a set of reference files that can be created with the make_refs module.
 ```
 # polytect extract_reads [gene] [patient] [sample] [aligned_file] <cram_reference>
 polytect extract_reads hs-hg38-hla patient1 sample1 /path/to/sample1.bam
@@ -99,6 +100,7 @@ If haplotyping has already been done, this step can be skipped. Otherwise, the c
  - nm: max nm score to consider a "good" alignment, must match what was used in make_matrices
  - procotol: wgs or wes depending on experimental setup
 
+This module expects a set of reference files that can be created with the make_refs module, and a set of extracted BAMs that can be produced with the extract_reads module.
 ```
 # polytect infer_haplotype [gene] [patient] [sample] [nm] [protocol]
 polytect infer_haplotype hs-hg38-hla patient1 sample1 1 wgs
@@ -111,6 +113,7 @@ Calls germline mutations relative to a haplotype reference. This can be either p
  - sample: sample ID
  - haplotype: filepath to CSV containing haplotype information
 
+This module expects a set of reference files that can be created with the make_refs module, and a set of extracted BAMs that can be produced with the extract_reads module.
 ```
 # polytect germline_mutations [gene] [patient] [sample] [haplotype]
 polytect germline_mutations hs-hg38-hla patient1 sample1 /path/to/haplotype.csv
