@@ -34,6 +34,7 @@ case "$1" in
         TOOLS_VER=1.0.0 ## TODO: refactor or remove versioning
         tar -xvf $POLYTECT_DIR/resources/tools-$TOOLS_VER.tar.gz -C $POLYTECT_DIR/build --skip-old-files
         bash $POLYTECT_DIR/build/tools-$TOOLS_VER/setup-tools.sh
+        exit 0
     ;;
     make_refs)
         args=( \
@@ -41,12 +42,6 @@ case "$1" in
             --snakefile $POLYTECT_DIR/pipelines/make_refs.smk \
             --directory $POLYTECT_DIR \
             --cores $NCORES)
-        case ${@: -1} in
-            dryrun)
-            args=(${args[@]} --dryrun)
-            ;;
-        esac
-        snakemake "${args[@]}"
     ;;
     extract_reads)
         args=( \
@@ -60,12 +55,6 @@ case "$1" in
             --snakefile $POLYTECT_DIR/pipelines/extract_reads.smk \
             --directory $PWD \
             --cores $NCORES)
-        case ${@: -1} in
-            dryrun)
-            args=(${args[@]} --dryrun)
-            ;;
-        esac
-        snakemake "${args[@]}"
     ;;
     make_matrices)
         args=( \
@@ -83,12 +72,6 @@ case "$1" in
             --snakefile $POLYTECT_DIR/pipelines/make_matrices.smk \
             --directory $PWD \
             --cores $NCORES)
-        case ${@: -1} in
-            dryrun)
-            args=(${args[@]} --dryrun)
-            ;;
-        esac
-        snakemake "${args[@]}"
     ;;
     infer_haplotype)
         args=( \
@@ -102,12 +85,6 @@ case "$1" in
             --snakefile $POLYTECT_DIR/pipelines/infer_haplotype.smk \
             --directory $PWD \
             --cores $NCORES)
-        case ${@: -1} in
-            dryrun)
-            args=(${args[@]} --dryrun)
-            ;;
-        esac
-        snakemake "${args[@]}"
     ;;
     germline_mutations)
         args=( \
@@ -120,12 +97,6 @@ case "$1" in
             --snakefile $POLYTECT_DIR/pipelines/call_germline_mutations.smk \
             --directory $PWD \
             --cores $NCORES)
-        case ${@: -1} in
-            dryrun)
-            args=(${args[@]} --dryrun)
-            ;;
-        esac
-        snakemake "${args[@]}"
     ;;
     tune_parameters)
         args=( \
@@ -140,12 +111,6 @@ case "$1" in
             --snakefile $POLYTECT_DIR/pipelines/tune_parameters.smk \
             --directory $PWD \
             --cores $NCORES)
-        case ${@: -1} in
-            dryrun)
-            args=(${args[@]} --dryrun)
-            ;;
-        esac
-        snakemake "${args[@]}"
     ;;
     help|"")
         cli_help
@@ -155,3 +120,11 @@ case "$1" in
         cli_help
     ;;
 esac
+
+case ${@: -1} in
+    dryrun)
+    args=(${args[@]} --dryrun)
+    ;;
+esac
+
+snakemake "${args[@]}"
