@@ -75,5 +75,5 @@ If using the haplotyping module, you must first simulate matrices that represent
   ```
   # sample command for whole genome sequencing
   # make_matrices [gene] [protocol] [min_insert_length] [max_insert_length] [read_length] [n_reads] [nm]
-  make matrices hs-hg38-hla wgs 125 325 151 2000 1
+  polytect make_matrices hs-hg38-hla wgs 125 325 151 2000 1
   ```
