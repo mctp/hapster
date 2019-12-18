@@ -11,13 +11,14 @@ NCORES = config['NCORES']
 patient = config['patient']
 sample = config['sample']
 nm = config['nm']
+protocol = config['protocol']
 
 # polytect global references
 genes = config['genes']
 fasta_files = {gene: str(PD / config['gene_prefix'] / "alts" / f"{gene}.fa") for gene in genes}
 bams = {gene: str(PD / "results" / patient / "alignments" / sample / f"{sample}_{gene}_complete.bam") for gene in genes}
 gene_cor_cutoffs = config['gene_cor_cutoffs']
-likelihood_files = {gene: str(PD / config['gene_prefix'] / "matrices" / f"{gene}_likelihoods.csv") for gene in genes}
+likelihood_files = {gene: str(PD / config['gene_prefix'] / "matrices" / f"{gene}_likelihoods_{protocol}.csv") for gene in genes}
 
 #Derived variables
 allele_ids = {gene:[record.id for record in SeqIO.parse(fasta, 'fasta')] for gene, fasta in fasta_files.items()}
