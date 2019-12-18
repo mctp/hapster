@@ -16,11 +16,11 @@ Commands:
          make_refs:	    Make all required reference files
               args:	        [gene] <dryrun>  
      make_matrices:	    Similate haplotyping matrices
-              args:	        [gene] [capture_targets] [min_insert_length] [max_insert_length] [similarity] [read_length] [n_reads] [nm] <dryrun>
+              args:	        [gene] [protocol] [min_insert_length] [max_insert_length] [read_length] [n_reads] [nm] [capture_targets] [similarity] <dryrun>
      extract_reads:	    Extract reads for polymorphic genes
               args:         [gene] [patient] [sample] [aligned_file] <cram_reference> <dryrun>
    infer_haplotype:     Infers haplotype for polymorphic genes
-              args:         [gene] [patient] [sample] [nm] <dryrun>
+              args:         [gene] [patient] [sample] [nm] [protocol] <dryrun>
 germline_mutations:     Calls germline mutations in polymorphic genes
               args:         [gene] [patient] [sample] [haplotype] <dryrun>
   *	   Help
@@ -82,13 +82,14 @@ case "$1:${@: -1}" in
             --configfile $POLYTECT_DIR/config/$2.yaml \
             --config POLYTECT_DIR=$POLYTECT_DIR \
                      NCORES=$NCORES \
-                     capture_targets=$3 \
+                     protocol=$3 \
                      min_insert_length=$4 \
                      max_insert_length=$5 \
-                     similarity=$6 \
-                     read_length=$7 \
-                     n_reads=$8 \
-                     nm=$9 \
+                     read_length=$6 \
+                     n_reads=$7 \
+                     nm=$8 \
+                     capture_targets=$9 \
+                     similarity=$10 \
             --snakefile $POLYTECT_DIR/pipelines/make_matrices.smk \
             --directory $PWD \
             --cores $NCORES \
@@ -99,13 +100,14 @@ case "$1:${@: -1}" in
             --configfile $POLYTECT_DIR/config/$2.yaml \
             --config POLYTECT_DIR=$POLYTECT_DIR \
                      NCORES=$NCORES \
-                     capture_targets=$3 \
+                     protocol=$3 \
                      min_insert_length=$4 \
                      max_insert_length=$5 \
-                     similarity=$6 \
-                     read_length=$7 \
-                     n_reads=$8 \
-                     nm=$9 \
+                     read_length=$6 \
+                     n_reads=$7 \
+                     nm=$8 \
+                     capture_targets=$9 \
+                     similarity=$10 \
             --snakefile $POLYTECT_DIR/pipelines/make_matrices.smk \
             --directory $PWD \
             --cores $NCORES
@@ -118,10 +120,11 @@ case "$1:${@: -1}" in
                      patient=$3 \
                      sample=$4 \
                      nm=$5 \
+                     protocol=$6 \
             --snakefile $POLYTECT_DIR/pipelines/infer_haplotype.smk \
             --directory $PWD \
             --cores $NCORES \
-            --dryrun
+            --dryrun -p
     ;;
     infer_haplotype:*)
         snakemake \
@@ -131,6 +134,7 @@ case "$1:${@: -1}" in
                      patient=$3 \
                      sample=$4 \
                      nm=$5 \
+                     protocol=$6 \
             --snakefile $POLYTECT_DIR/pipelines/infer_haplotype.smk \
             --directory $PWD \
             --cores $NCORES

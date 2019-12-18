@@ -13,13 +13,14 @@ PD = Path(config['POLYTECT_DIR'])
 NCORES = config['NCORES']
 
 #inputs
-capture_targets = config['capture_targets']
+protocol = config['protocol']
 min_insert_length = config['min_insert_length']
 max_insert_length = config['max_insert_length']
-similarity = config['similarity']
 read_length = config['read_length']
 n_reads = config['n_reads']
 nm = config['nm']
+capture_targets = config['capture_targets']
+similarity = config['similarity']
 
 # polytect global references
 genes = config['genes']
@@ -47,7 +48,7 @@ faidx_id = {k:{f"{re.sub('[^0-9a-zA-Z]+', '_', x)}":x for x in v} for k, v in al
 rule all:
     input:
         #expand("temp/sim/{allele}_counts.txt", allele = allele_filenames),
-        matrices = [PD / config["gene_prefix"] / "matrices" / f"{gene}_likelihoods.csv" for gene in genes]
+        matrices = [PD / config["gene_prefix"] / "matrices" / f"{gene}_likelihoods_{protocol}.csv" for gene in genes]
 
 #Makes a fasta file for use for simming reads
 #This is where you can add pseudogenes to your real genes if you want
@@ -95,8 +96,8 @@ rule sim_exome_capture:
         capture_targets = capture_targets,
         insert_fastq = rules.sim_reads.output.insert_fastq
     output:
-        exome_fq1 = temp(f"temp/sim/{{gene}}/{{allele}}_reads.fq1"),
-        exome_fq2 = temp(f"temp/sim/{{gene}}/{{allele}}_reads.fq2")
+        exome_fq1 = temp(f"temp/sim/{{gene}}/{{allele}}_reads_wes.fq1"),
+        exome_fq2 = temp(f"temp/sim/{{gene}}/{{allele}}_reads_wes.fq2")
     shell:
         """
         python scripts/targeted_enrichment.py \
@@ -108,10 +109,25 @@ rule sim_exome_capture:
             {read_length}
         """
 
+rule inserts_to_reads:
+    input:
+        insert_fastq = rules.sim_reads.output.insert_fastq
+    output:
+        wgs_fq1 = temp(f"temp/sim/{{gene}}/{{allele}}_reads_wgs.fq1"),
+        wgs_fq2 = temp(f"temp/sim/{{gene}}/{{allele}}_reads_wgs.fq2")
+    shell:
+        """
+        python scripts/inserts_to_reads.py \
+            {input.insert_fastq} \
+            {output.wgs_fq1} \
+            {output.wgs_fq2} \
+            {read_length}
+        """
+
 rule remove_ignored:
     input:
-        fq1 = rules.sim_exome_capture.output.exome_fq1,
-        fq2 = rules.sim_exome_capture.output.exome_fq2,
+        fq1 = f"temp/sim/{{gene}}/{{allele}}_reads_{protocol}.fq1",
+        fq2 = f"temp/sim/{{gene}}/{{allele}}_reads_{protocol}.fq2",
         extraction_ref = extraction_reference,
         full_ref = complete_reference
     output:
@@ -130,7 +146,7 @@ rule remove_ignored:
             samtools sort > {output.extracted_sorted_bam}
         samtools index {output.extracted_sorted_bam}
         samtools view -hb {output.extracted_sorted_bam} {full_regions} > {output.no_ignored_bam}
-        ./bin/biobambam2/x86_64-linux-gnu/2.0.146/bin/bamtofastq \
+        bamtofastq \
             collate=1 \
             filename={output.no_ignored_bam} \
             gz=0 \
@@ -141,7 +157,7 @@ rule remove_ignored:
             O={output.orphan1} \
             O2={output.orphan2}
         bwa mem {input.full_ref} {output.fq1} {output.fq2} | \
-            ./bin/k8 ./bin/bwa-postalt.js {complete_reference_alt} | \
+            k8 ./bin/bwa-postalt.js {complete_reference_alt} | \
             samtools view -hb | \
             samtools sort -n -o {output.out_bam}
         """
@@ -225,6 +241,6 @@ rule make_symmetrical:
     input:
         matrix_raw = rules.consolidate_counts.output.matrix_raw
     output:
-        matrix = PD / config["gene_prefix"] / "matrices" / f"{{gene}}_likelihoods.csv"
+        matrix = PD / config["gene_prefix"] / "matrices" / f"{{gene}}_likelihoods_{protocol}.csv"
     script:
         "../scripts/make_symmetrical.R"
