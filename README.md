@@ -63,6 +63,7 @@ polytect make_refs hs-hg38-hla
 ### Simulate likelihood matrices
 
 If using the haplotyping module, you must first simulate matrices that represent the probability of reads generated from one allele aligning to another allele. This can be done using the make_matrices pipeline and requires the following inputs:
+ - gene: gene name
  - protocol: wgs or wes, depending on the experimental setup  
  - min_insert_length: min insert size to simulate, recommended as mean insert length - 2 * SD from experiment being simulated  
  - max_insert_length: max insert size to simulate, recommended as mean insert length + 2 * SD from experiment being simulated  
@@ -77,3 +78,16 @@ If using the haplotyping module, you must first simulate matrices that represent
   # make_matrices [gene] [protocol] [min_insert_length] [max_insert_length] [read_length] [n_reads] [nm]
   polytect make_matrices hs-hg38-hla wgs 125 325 151 2000 1
   ```
+
+### Extract reads specific to the region of interest
+To improve run time for later parts of the algorithm, we extract reads specific to the region of interest. Since we expect the base alignment to be poor, we don't know for sure that all of our reads are at the annotated coordinates for our genes, so we can't just extract based on location. Requires the following inputs:
+ - gene: gene name
+ - patient: patient ID
+ - sample: sample ID
+ - aligned_file: filepath to alignment we are extracting reads from
+ - cram_reference: filepath to reference used to generate a cram file, only required if extracting reads from a .cram file
+
+```
+# polytect extract_reads [gene] [patient] [sample] [aligned_file] <cram_reference>
+polytect extract_reads hs-hg38-hla patient1 sample1 sample1.bam
+```
