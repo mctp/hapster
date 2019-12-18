@@ -32,6 +32,8 @@ with open(haplotype, 'r') as f:
 rule all:
     input:
         hap_fa = expand(f"results/{patient}/refs/{sample}_" + "{gene}_original.fa", gene = genes),
+        deduped_bam = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_haplotype_realigned.bam", gene = genes),
+        bam_bai = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_haplotype_realigned.bam.bai", gene = genes),
         germline_vcf = expand(f"results/{patient}/calls/{sample}_" + "{gene}_germline_filtered.vcf", gene = genes)
 
 rule create_regions_list:
@@ -84,8 +86,8 @@ rule realign_to_haplotype_ref:
         fq2 = lambda w: fq2s[w.gene]
     output:
         bam = temp(f"temp/{sample}/{sample}_{{gene}}_realigned.bam"),
-        deduped_bam = temp(f"temp/{sample}/{sample}_{{gene}}_realigned_deduped.bam"),
-        bam_bai = temp(f"temp/{sample}/{sample}_{{gene}}_realigned_deduped.bam.bai"),
+        deduped_bam = f"results/{patient}/alignments/{sample}/{sample}_{{gene}}_haplotype_realigned.bam",
+        bam_bai = f"results/{patient}/alignments/{sample}/{sample}_{{gene}}_haplotype_realigned.bam.bai",
         metrics = temp(f"temp/{sample}/{sample}_{{gene}}_realigned_deduped_metrics.txt")
     params:
         read_group = lambda w: f"@RG\\tSM:{sample}\\tID:{sample}\\tPL:ILLUMINA\\tLB:{sample}"
