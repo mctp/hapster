@@ -94,7 +94,7 @@ rule call_haplotype:
     params:
         cutoff = lambda w: gene_cor_cutoffs[w.gene]
     script:
-        "/home/mumphrey/Projects/hla_pipeline/scripts/type_alleles_min.R"
+        "../scripts/type_alleles.R"
 
 rule consolidate_haplotypes:
     input:
