@@ -89,7 +89,7 @@ To improve run time for later parts of the algorithm, we extract reads specific 
 
 ```
 # polytect extract_reads [gene] [patient] [sample] [aligned_file] <cram_reference>
-polytect extract_reads hs-hg38-hla patient1 sample1 sample1.bam
+polytect extract_reads hs-hg38-hla patient1 sample1 /path/to/sample1.bam
 ```
 ### Infer haplotype
 If haplotyping has already been done, this step can be skipped. Otherwise, the command can be run with the following inputs:
@@ -102,4 +102,16 @@ If haplotyping has already been done, this step can be skipped. Otherwise, the c
 ```
 # polytect infer_haplotype [gene] [patient] [sample] [nm] [protocol]
 polytect infer_haplotype hs-hg38-hla patient1 sample1 1 wgs
+```
+
+### Call germline mutations
+Calls germline mutations relative to a haplotype reference. This can be either produced with the infer_haplotype module, or provided based on external haplotyping. The command can be run with the following inputs:
+ - gene: gene name
+ - patient: patient ID
+ - sample: sample ID
+ - haplotype: filepath to CSV containing haplotype information
+
+```
+# polytect germline_mutations [gene] [patient] [sample] [haplotype]
+polytect germline_mutations hs-hg38-hla patient1 sample1 /path/to/haplotype.csv
 ```
