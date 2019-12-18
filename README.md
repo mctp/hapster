@@ -65,7 +65,7 @@ polytect make_refs hs-hg38-hla
 If using the haplotyping module, you must first simulate matrices that represent the probability of reads generated from one allele aligning to another allele. This can be done using the make_matrices pipeline and requires the following inputs:
  - gene: gene name
  - protocol: wgs or wes, depending on the experimental setup  
- - min_insert_length: min insert size to simulate, recommended as mean insert length - 2 * SD from experiment being simulated  
+ - min_insert_length: min insert size to simulate, recommended as mean insert length - 2 * SD from experiment being simulated, or if this value is less than your read_length then just set equal to read_length
  - max_insert_length: max insert size to simulate, recommended as mean insert length + 2 * SD from experiment being simulated  
  - read_length: length of reads in the experiment being simulated  
  - n_reads: number of reads to simulate, recommend at least 2000  
@@ -76,7 +76,7 @@ If using the haplotyping module, you must first simulate matrices that represent
   ```
   # sample command for whole genome sequencing
   # make_matrices [gene] [protocol] [min_insert_length] [max_insert_length] [read_length] [n_reads] [nm]
-  polytect make_matrices hs-hg38-hla wgs 125 325 151 2000 1
+  polytect make_matrices hs-hg38-hla wgs 151 674 151 2000 1
   ```
 
 ### Extract reads specific to the region of interest
