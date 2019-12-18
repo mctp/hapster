@@ -63,14 +63,14 @@ polytect make_refs hs-hg38-hla
 ### Simulate likelihood matrices
 
 If using the haplotyping module, you must first simulate matrices that represent the probability of reads generated from one allele aligning to another allele. This can be done using the make_matrices pipeline and requires the following inputs:
-  protocol: wgs or wes, depending on the experimental setup
-  min_insert_length: min insert size to simulate, recommended as mean insert length - 2 * SD from experiment being simulated
-  max_insert_length: max insert size to simulate, recommended as mean insert length + 2 * SD from experiment being simulated
-  read_length: length of reads in the experiment being simulated
-  n_reads: number of reads to simulate, recommend at least 2000
-  nm: max nm score to consider a "good" alignment, recommend 1
-  capture_targets: required if simulating a WES experiment, list of capture probes
-  similarity: percent sequence similarity between probe and insert to consider it captured, recommend .82
+ - protocol: wgs or wes, depending on the experimental setup  
+ - min_insert_length: min insert size to simulate, recommended as mean insert length - 2 * SD from experiment being simulated  
+ - max_insert_length: max insert size to simulate, recommended as mean insert length + 2 * SD from experiment being simulated  
+ - read_length: length of reads in the experiment being simulated  
+ - n_reads: number of reads to simulate, recommend at least 2000  
+ - nm: max nm score to consider a "good" alignment, recommend 1  
+ - capture_targets: required if simulating a WES experiment, list of capture probes  
+ - similarity: percent sequence similarity between probe and insert to consider it captured, recommend .82  
   
   ```
   # sample command for whole genome sequencing
