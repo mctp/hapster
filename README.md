@@ -91,3 +91,15 @@ To improve run time for later parts of the algorithm, we extract reads specific 
 # polytect extract_reads [gene] [patient] [sample] [aligned_file] <cram_reference>
 polytect extract_reads hs-hg38-hla patient1 sample1 sample1.bam
 ```
+### Infer haplotype
+If haplotyping has already been done, this step can be skipped. Otherwise, the command can be run with the following inputs:
+ - gene: gene name
+ - patient: patient ID
+ - sample: sample ID
+ - nm: max nm score to consider a "good" alignment, must match what was used in make_matrices
+ - procotol: wgs or wes depending on experimental setup
+
+```
+# polytect infer_haplotype [gene] [patient] [sample] [nm] [protocol]
+polytect infer_haplotype hs-hg38-hla patient1 sample1 1 wgs
+```
