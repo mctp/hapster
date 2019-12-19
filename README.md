@@ -73,6 +73,7 @@ If using the haplotyping module, you must first simulate matrices that represent
  - capture_targets: required if simulating a WES experiment, list of capture probes  
  - similarity: percent sequence similarity between probe and insert to consider it captured, recommend .82  
   
+This module expects a set of reference files that can be created with the make_refs module.
   ```
   # sample command for whole genome sequencing
   # make_matrices [gene] [protocol] [min_insert_length] [max_insert_length] [read_length] [n_reads] [nm]
