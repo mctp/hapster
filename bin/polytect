@@ -68,7 +68,7 @@ case "$1" in
                      n_reads=$7 \
                      nm=$8 \
                      capture_targets=$9 \
-                     similarity=$10 \
+                     similarity=${10} \
             --snakefile $POLYTECT_DIR/pipelines/make_matrices.smk \
             --directory $PWD \
             --cores $NCORES)
