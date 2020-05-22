@@ -103,11 +103,12 @@ case "$1" in
             --configfile $POLYTECT_DIR/config/$2.yaml \
             --config POLYTECT_DIR=$POLYTECT_DIR \
                      NCORES=$NCORES \
-                     patient=$3 \
-                     sample=$4 \
-                     aligned_file=$5 \
-                     cram_reference=$6 \
-                     nm=$7 \
+                     protocol=$3 \
+                     patient=$4 \
+                     sample=$5 \
+                     aligned_file=$6 \
+                     cram_reference=$7 \
+                     nm=$8 \
             --snakefile $POLYTECT_DIR/pipelines/tune_parameters.smk \
             --directory $PWD \
             --cores $NCORES)

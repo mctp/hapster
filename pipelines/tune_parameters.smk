@@ -14,6 +14,7 @@ PD = Path(config['POLYTECT_DIR'])
 NCORES = config['NCORES']
 
 #Inputs
+protocol = config['protocol']
 patient = config['patient']
 sample = config['sample']
 aligned_file = config['aligned_file']
@@ -85,6 +86,7 @@ rule infer_haplotype:
                      patient={patient} \
                      sample={sample} \
                      nm={nm} \
+                     protocol={protocol} \
             --snakefile {PD}/pipelines/infer_haplotype.smk \
             --directory {PD} \
             --cores {NCORES}
@@ -95,6 +97,7 @@ rule infer_haplotype:
                      patient={patient} \
                      sample={sample} \
                      nm={nm} \
+                     protocol={protocol} \
             --snakefile {PD}/pipelines/infer_haplotype.smk \
             --directory {PD} \
             --cores {NCORES}
