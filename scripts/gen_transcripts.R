@@ -1,14 +1,24 @@
+library(stringr)
 library(rtracklayer)
 library(Biostrings)
 library(GenomicFeatures)
+library(BSgenome)
+library(foreach)
 
 ##
-alt.fa <- list.files("refs/hs-hg38/hla/alts", "^[A-Z]", full.names=TRUE)
-alt.gff <- list.files("refs/hs-hg38/hla/gff", "^[A-Z]", full.names=TRUE)
-alt.seq <- unlist(DNAStringSetList(lapply(alt.fa, readDNAStringSet)))
-alt.gr <- unlist(GRangesList(lapply(alt.gff, import)))
-alt.exon <- alt.gr[alt.gr$type %in% c("exon", "five_prime_UTR", "three_prime_UTR")]
-alt.exon$type <- "exon"
-alt.txs <- split(alt.exon, seqnames(alt.exon))
-extr <- extractTranscriptSeqs(alt.seq, alt.txs)
-writeXStringSet(extr, "refs/hs-hg38/hla/transcripts.fa")
+alt.fa <- list.files("refs/hs-hg38/hla/alts", full.names=TRUE, pattern="^[bA-Z].*.fa$")
+alt.gff <- list.files("refs/hs-hg38/hla/gff", full.names=TRUE, pattern="^[bA-Z].*.gff$")
+
+genes <- mapply(list, alt.fa, alt.gff, SIMPLIFY=F)
+names(genes) <- str_replace(basename(alt.fa), ".fa", "")
+foreach(gene=names(genes)) %do% {
+    gene.fa <- genes[[gene]][[1]]
+    gene.gff <- genes[[gene]][[2]]
+    gene.seq <- readDNAStringSet(gene.fa)
+    gene.gr <- import(gene.gff)
+    gene.exon <- gene.gr[gene.gr$type %in% c("exon", "five_prime_UTR", "three_prime_UTR")]
+    gene.exon$type <- "exon"
+    gene.txs <- split(gene.exon, seqnames(gene.exon))
+    tx.seq <- extractTranscriptSeqs(gene.seq, gene.txs)
+    writeXStringSet(tx.seq, sprintf("refs/hs-hg38/hla/rna/%s.fa", gene))
+}
