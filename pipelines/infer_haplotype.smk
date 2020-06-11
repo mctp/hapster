@@ -22,6 +22,8 @@ likelihood_files = {gene: str(PD / config['gene_prefix'] / "matrices" / f"{gene}
 
 #Derived variables
 allele_ids = {gene:[record.id for record in SeqIO.parse(fasta, 'fasta')] for gene, fasta in fasta_files.items()}
+if isinstance(gene_cor_cutoffs, float):
+    gene_cor_cutoffs = {gene:gene_cor_cutoffs for gene in genes}
 
 rule all:
     input:

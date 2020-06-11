@@ -87,6 +87,7 @@ rule infer_haplotype:
                      sample={sample} \
                      nm={nm} \
                      protocol={protocol} \
+                     gene_cor_cutoffs={wildcards.cutoff} \
             --snakefile {PD}/pipelines/infer_haplotype.smk \
             --directory {PD} \
             --cores {NCORES}
@@ -98,6 +99,7 @@ rule infer_haplotype:
                      sample={sample} \
                      nm={nm} \
                      protocol={protocol} \
+                     gene_cor_cutoffs={wildcards.cutoff} \
             --snakefile {PD}/pipelines/infer_haplotype.smk \
             --directory {PD} \
             --cores {NCORES}

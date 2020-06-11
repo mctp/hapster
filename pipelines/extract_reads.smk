@@ -36,6 +36,7 @@ with open(regions, 'r') as f:
 # File for biobambam
 # Changes depending on input format
 bambam_format = Path(aligned_file).suffix[1:]
+print(f"File format: {bambam_format}")
 if bambam_format == "cram":
     bambam_file = f"temp/{sample}/{sample}_original.bam"
     bambam_format = "bam"
@@ -221,8 +222,8 @@ rule remove_blacklisted:
         fq2 = rules.unalign_reads_from_alt.output.fq2,
         extraction_reference = extraction_reference
     output:
-        extracted_sorted_bam = temp(f"temp/{sample}/{sample}_gene_extracted.bam"),
-        extracted_sorted_bai = temp(f"temp/{sample}/{sample}_gene_extracted.bam.bai"),
+        extracted_sorted_bam = temp(f"temp/{sample}/{sample}_extraction.bam"),
+        extracted_sorted_bai = temp(f"temp/{sample}/{sample}_extraction.bam.bai"),
         no_blacklist_bam = temp(f"temp/{sample}/{sample}_extracted_no_blacklist.bam")
     threads: NCORES
     shell:
