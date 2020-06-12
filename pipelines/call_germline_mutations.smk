@@ -16,7 +16,7 @@ haplotype = config['haplotype']
 genes = config['genes']
 fq1s = {gene: str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes}
 fq2s = {gene: str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes}
-fasta_files = {gene: str(PD / config['gene_prefix'] / "alts" / f"{gene}.fa") for gene in genes}
+fasta_files = [str(PD / config['gene_prefix'] / "alts" / f"{gene}.fa") for gene in genes]
 
 #Derived variables
 with open(haplotype, 'r') as f:
@@ -47,7 +47,7 @@ rule create_regions_list:
 
 rule make_haplotype_ref:
     input:
-        fa = [x for x in fasta_files.values],
+        fa = [x for x in fasta_files],
         haplotype = haplotype
     output:
         temp_fa = temp(f"temp/{sample}/fa_full.fa"),
@@ -61,12 +61,12 @@ rule make_haplotype_ref:
         hap_dict = temp(f"temp/{sample}/{sample}.dict"),
         hap_fa_saved = f"results/{patient}/refs/{sample}_original.fa"
     params:
-        fasta_string = "\n".join([x for x in fasta_files]),
+        fasta_string = " ".join([x for x in fasta_files]),
         haplotype_string = haplotype_string
     shell:
         """
-        for FASTA in $(echo {params.fasta_string}); do cat $FASTA >> {output.temp_fa}; done;
-        for ALLELE in $(echo {params.haplotype_string}); do samtools faidx {output.temp_fa} $ALLELE >> {output.hap_fa}; done;
+        for FASTA in "$(echo {params.fasta_string})"; do cat $FASTA >> {output.temp_fa}; done;
+        for ALLELE in "$(echo {params.haplotype_string})"; do samtools faidx {output.temp_fa} $ALLELE >> {output.hap_fa}; done;
         bwa index {output.hap_fa}
         samtools faidx {output.hap_fa}
         picard CreateSequenceDictionary R={output.hap_fa}
