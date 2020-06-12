@@ -1,10 +1,14 @@
-configfile: "/home/mumphrey/Projects/hla_pipeline/config/realign_to_germline_ref_config.yaml"
+from pathlib import Path
+
+# polytect runtime
+PD = Path(config['POLYTECT_DIR'])
+NCORES = config['NCORES']
 
 #Inputs
-germline_vcfs = config['vcfs']
-refs = config['refs']
-fq1s = config['fq1s']
-fq2s = config['fq2s']
+germline_vcf = config['vcf']
+ref = config['ref']
+fq1 = config['fq1']
+fq2 = config['fq2']
 
 #Sample information
 patient = config['patient']
@@ -21,18 +25,18 @@ rule all:
 
 rule make_germline_ref:
     input:
-        vcf = lambda w: germline_vcfs[w.gene],
-        hap_fa = lambda w: refs[w.gene]
+        vcf = germline_vcf,
+        hap_fa = ref
     output:
-        germ_fa_raw = temp(f"results/{patient}/refs/{patient}_{{gene}}_raw_germline_imputed.fa"),
-        germ_fa = f"results/{patient}/refs/{patient}_{{gene}}_germline_imputed.fa",
-        germ_fa_amb = f"results/{patient}/refs/{patient}_{{gene}}_germline_imputed.fa.amb",
-        germ_fa_ann = f"results/{patient}/refs/{patient}_{{gene}}_germline_imputed.fa.ann",
-        germ_fa_bwt = f"results/{patient}/refs/{patient}_{{gene}}_germline_imputed.fa.bwt",
-        germ_fa_pac = f"results/{patient}/refs/{patient}_{{gene}}_germline_imputed.fa.pac",
-        germ_fa_fai = f"results/{patient}/refs/{patient}_{{gene}}_germline_imputed.fa.fai",
-        germ_fa_sa = f"results/{patient}/refs/{patient}_{{gene}}_germline_imputed.fa.sa",
-        germ_dict = f"results/{patient}/refs/{patient}_{{gene}}_germline_imputed.dict"
+        germ_fa_raw = temp(f"results/{patient}/refs/{patient}_raw_germline_imputed.fa"),
+        germ_fa = f"results/{patient}/refs/{patient}_germline_imputed.fa",
+        germ_fa_amb = f"results/{patient}/refs/{patient}_germline_imputed.fa.amb",
+        germ_fa_ann = f"results/{patient}/refs/{patient}_germline_imputed.fa.ann",
+        germ_fa_bwt = f"results/{patient}/refs/{patient}_germline_imputed.fa.bwt",
+        germ_fa_pac = f"results/{patient}/refs/{patient}_germline_imputed.fa.pac",
+        germ_fa_fai = f"results/{patient}/refs/{patient}_germline_imputed.fa.fai",
+        germ_fa_sa = f"results/{patient}/refs/{patient}_germline_imputed.fa.sa",
+        germ_dict = f"results/{patient}/refs/{patient}_germline_imputed.dict"
     shell:
         """
         python /home/mumphrey/Projects/hla_pipeline/scripts/create_germline_ref.py {input.hap_fa} {input.vcf} {output.germ_fa}
@@ -42,13 +46,13 @@ rule realign_to_germline_ref:
     input:
         rules.make_germline_ref.output,
         germ_fa = rules.make_germline_ref.output.germ_fa,
-        fq1 = lambda w: fq1s[w.gene],
-        fq2 = lambda w: fq2s[w.gene]
+        fq1 = fq1,
+        fq2 = fq2
     output:
-        bam = temp(f"temp/{sample}/germline_{sample}_{{gene}}_realigned.bam"),
-        deduped_bam = f"results/{patient}/alignments/{sample}_{{gene}}_germline_imputed.bam",
-        bam_bai = f"results/{patient}/alignments/{sample}_{{gene}}_germline_imputed.bam.bai",
-        metrics = temp(f"temp/{sample}/germline_{sample}_{{gene}}_realigned_deduped_metrics.txt")
+        bam = temp(f"temp/{sample}/germline_{sample}_realigned.bam"),
+        deduped_bam = f"results/{patient}/alignments/{sample}_germline_imputed.bam",
+        bam_bai = f"results/{patient}/alignments/{sample}_germline_imputed.bam.bai",
+        metrics = temp(f"temp/{sample}/germline_{sample}_realigned_deduped_metrics.txt")
     params:
         read_group = f"@RG\\tSM:{sample}\\tID:{sample}\\tPL:ILLUMINA\\tLB:{sample}"
     threads: 4
