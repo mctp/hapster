@@ -26,9 +26,9 @@ with open(haplotype, 'r') as f:
 rule all:
     input:
         hap_fa = f"results/{patient}/refs/{sample}_original.fa",
-        deduped_bam = f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_haplotype_realigned.bam",
-        bam_bai = f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_haplotype_realigned.bam.bai",
-        germline_vcf = f"results/{patient}/calls/{sample}_" + "{gene}_germline_filtered.vcf"
+        deduped_bam = f"results/{patient}/alignments/{sample}/{sample}_haplotype_realigned.bam",
+        bam_bai = f"results/{patient}/alignments/{sample}/{sample}_haplotype_realigned.bam.bai",
+        germline_vcf = f"results/{patient}/calls/{sample}_germline_filtered.vcf"
 
 rule create_regions_list:
     input:
