@@ -19,19 +19,13 @@ fq2s = {gene: str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}
 fasta_files = {gene: str(PD / config['gene_prefix'] / "alts" / f"{gene}.fa") for gene in genes}
 
 #Derived variables
-haplotype_dict = {}
 with open(haplotype, 'r') as f:
     alleles = next(f).strip().split(',')[1:]
-    for allele in alleles:
-        gene = allele.split('*')[0]
-        if gene in haplotype_dict:
-            haplotype_dict[gene].append(allele)
-        else:
-            haplotype_dict[gene] = [allele]
+    haplotype_string = ' '.join(alleles)
 
 rule all:
     input:
-        hap_fa = expand(f"results/{patient}/refs/{sample}_" + "{gene}_original.fa", gene = genes),
+        hap_fa = f"results/{patient}/refs/{sample}_original.fa",
         deduped_bam = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_haplotype_realigned.bam", gene = genes),
         bam_bai = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_haplotype_realigned.bam.bai", gene = genes),
         germline_vcf = expand(f"results/{patient}/calls/{sample}_" + "{gene}_germline_filtered.vcf", gene = genes)
@@ -53,25 +47,26 @@ rule create_regions_list:
 
 rule make_haplotype_ref:
     input:
-        fa = lambda w: fasta_files[w.gene],
+        fa = [x for x in fasta_files],
         haplotype = haplotype
     output:
-        hap_fa = temp(f"temp/{sample}/{sample}_{{gene}}.fa"),
-        hap_fa_amb = temp(f"temp/{sample}/{sample}_{{gene}}.fa.amb"),
-        hap_fa_ann = temp(f"temp/{sample}/{sample}_{{gene}}.fa.ann"),
-        hap_fa_bwt = temp(f"temp/{sample}/{sample}_{{gene}}.fa.bwt"),
-        hap_fa_pac = temp(f"temp/{sample}/{sample}_{{gene}}.fa.pac"),
-        hap_fa_fai = temp(f"temp/{sample}/{sample}_{{gene}}.fa.fai"),
-        hap_fa_sa = temp(f"temp/{sample}/{sample}_{{gene}}.fa.sa"),
-        hap_dict = temp(f"temp/{sample}/{sample}_{{gene}}.dict"),
-        hap_fa_saved = f"results/{patient}/refs/{sample}_{{gene}}_original.fa"
+        temp_fa = temp(f"temp/{sample}/fa_full.fa"),
+        hap_fa = temp(f"temp/{sample}/{sample}.fa"),
+        hap_fa_amb = temp(f"temp/{sample}/{sample}.fa.amb"),
+        hap_fa_ann = temp(f"temp/{sample}/{sample}.fa.ann"),
+        hap_fa_bwt = temp(f"temp/{sample}/{sample}.fa.bwt"),
+        hap_fa_pac = temp(f"temp/{sample}/{sample}.fa.pac"),
+        hap_fa_fai = temp(f"temp/{sample}/{sample}.fa.fai"),
+        hap_fa_sa = temp(f"temp/{sample}/{sample}.fa.sa"),
+        hap_dict = temp(f"temp/{sample}/{sample}.dict"),
+        hap_fa_saved = f"results/{patient}/refs/{sample}_original.fa"
     params:
-        allele_1 = lambda w: sorted(haplotype_dict[w.gene])[0],
-        allele_2 = lambda w: sorted(haplotype_dict[w.gene])[1]
+        fasta_string = "\n".join([x for x in fasta_files]),
+        haplotype_string = haplotype_string
     shell:
         """
-        samtools faidx {input.fa} {params.allele_1} >> {output.hap_fa}
-        samtools faidx {input.fa} {params.allele_2} >> {output.hap_fa}
+        for FASTA in $(echo {params.fasta_string}); do cat $FASTA >> {output.temp_fa}; done;
+        for ALLELE in $(echo {params.haplotype_string}); do samtools faidx {output.temp_fa} $ALLELE >> {output.hap_fa}; done;
         bwa index {output.hap_fa}
         samtools faidx {output.hap_fa}
         picard CreateSequenceDictionary R={output.hap_fa}
