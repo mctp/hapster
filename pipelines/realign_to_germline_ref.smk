@@ -7,8 +7,8 @@ NCORES = config['NCORES']
 #Inputs
 germline_vcf = config['vcf']
 ref = config['ref']
-fq1 = config['fq1']
-fq2 = config['fq2']
+fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes]
+fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]
 
 #Sample information
 patient = config['patient']
@@ -46,18 +46,24 @@ rule realign_to_germline_ref:
     input:
         rules.make_germline_ref.output,
         germ_fa = rules.make_germline_ref.output.germ_fa,
-        fq1 = fq1,
-        fq2 = fq2
+        fq1 = [x for x in fq1s],
+        fq2 = [x for x in fq2s]
     output:
+        temp_fq1 = temp(f"temp/{sample}/{sample}_temp_1.fq"),
+        temp_fq2 = temp(f"temp/{sample}/{sample}_temp_2.fq"),
         bam = temp(f"temp/{sample}/germline_{sample}_realigned.bam"),
         deduped_bam = f"results/{patient}/alignments/{sample}_germline_imputed.bam",
         bam_bai = f"results/{patient}/alignments/{sample}_germline_imputed.bam.bai",
         metrics = temp(f"temp/{sample}/germline_{sample}_realigned_deduped_metrics.txt")
     params:
+        fq1 = " ".join([x for x in fq1s]),
+        fq2 = " ".join([x for x in fq2s]),
         read_group = f"@RG\\tSM:{sample}\\tID:{sample}\\tPL:ILLUMINA\\tLB:{sample}"
     threads: 4
     shell:
         """
+        for FQ in "$(echo {params.fq1})"; do cat $FQ >> {output.temp_fq1}; done;
+        for FQ in "$(echo {params.fq2})"; do cat $FQ >> {output.temp_fq2}; done;
         bwa mem -t 4 {input.germ_fa} {input.fq1} {input.fq2} -R "{params.read_group}" | \
             samtools sort -@ 4 | \
             samtools view -@ 4 -hb > {output.bam}
