@@ -14,8 +14,8 @@ haplotype = config['haplotype']
 
 # polytect global references
 genes = config['genes']
-fq1s = {gene: str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes}
-fq2s = {gene: str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes}
+fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes]
+fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]
 fasta_files = [str(PD / config['gene_prefix'] / "alts" / f"{gene}.fa") for gene in genes]
 
 #Derived variables
@@ -77,19 +77,25 @@ rule realign_to_haplotype_ref:
     input:
         rules.make_haplotype_ref.output,
         hap_fa = rules.make_haplotype_ref.output.hap_fa,
-        fq1 = lambda w: fq1s[w.gene],
-        fq2 = lambda w: fq2s[w.gene]
+        fq1 = [x for x in fq1],
+        fq2 = [x for x in fq2]
     output:
-        bam = temp(f"temp/{sample}/{sample}_{{gene}}_realigned.bam"),
-        deduped_bam = f"results/{patient}/alignments/{sample}/{sample}_{{gene}}_haplotype_realigned.bam",
-        bam_bai = f"results/{patient}/alignments/{sample}/{sample}_{{gene}}_haplotype_realigned.bam.bai",
-        metrics = temp(f"temp/{sample}/{sample}_{{gene}}_realigned_deduped_metrics.txt")
+        temp_fq1 = temp(f"temp/{sample}/{sample}_temp_1.fq"),
+        temp_fq2 = temp(f"temp/{sample}/{sample}_temp_2.fq"),
+        bam = temp(f"temp/{sample}/{sample}_realigned.bam"),
+        deduped_bam = f"results/{patient}/alignments/{sample}/{sample}_haplotype_realigned.bam",
+        bam_bai = f"results/{patient}/alignments/{sample}/{sample}_haplotype_realigned.bam.bai",
+        metrics = temp(f"temp/{sample}/{sample}_realigned_deduped_metrics.txt")
     params:
+        fq1 = " ".join([x for x in fq1]),
+        fq2 = " ".join([x for x in fq2]),
         read_group = lambda w: f"@RG\\tSM:{sample}\\tID:{sample}\\tPL:ILLUMINA\\tLB:{sample}"
     threads: NCORES
     shell:
         """
-        bwa mem -t 4 {input.hap_fa} {input.fq1} {input.fq2} -R "{params.read_group}" | \
+        for FQ in "$(echo {params.fq1})"; do cat $FQ >> {output.temp_fq1}; done;
+        for FQ in "$(echo {params.fq2})"; do cat $FQ >> {output.temp_fq2}; done;
+        bwa mem -t 4 {input.hap_fa} {output.temp_fq1} {output.temp_fq2} -R "{params.read_group}" | \
             samtools sort -@ 4 | \
             samtools view -@ 4 -hb > {output.bam}
         picard MarkDuplicates I={output.bam} O={output.deduped_bam} M={output.metrics}
