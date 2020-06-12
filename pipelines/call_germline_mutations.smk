@@ -26,9 +26,9 @@ with open(haplotype, 'r') as f:
 rule all:
     input:
         hap_fa = f"results/{patient}/refs/{sample}_original.fa",
-        deduped_bam = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_haplotype_realigned.bam", gene = genes),
-        bam_bai = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_haplotype_realigned.bam.bai", gene = genes),
-        germline_vcf = expand(f"results/{patient}/calls/{sample}_" + "{gene}_germline_filtered.vcf", gene = genes)
+        deduped_bam = f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_haplotype_realigned.bam",
+        bam_bai = f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_haplotype_realigned.bam.bai",
+        germline_vcf = f"results/{patient}/calls/{sample}_" + "{gene}_germline_filtered.vcf"
 
 rule create_regions_list:
     input:
@@ -106,7 +106,7 @@ rule mapq_to_60:
     input:
         normal_bam=rules.realign_to_haplotype_ref.output.deduped_bam
     output:
-        normal_bam_60=temp(f"temp/{sample}/{sample}_{{gene}}_realigned_deduped_60.bam")
+        normal_bam_60=temp(f"temp/{sample}/{sample}_realigned_deduped_60.bam")
     run:
         normal_bam = pysam.AlignmentFile(input.normal_bam, 'rb')
         normal_bam_60 = pysam.AlignmentFile(output.normal_bam_60, 'wb', template = normal_bam)
@@ -131,7 +131,7 @@ rule call_germline_mutations:
         normal_bam=rules.mapq_to_60.output.normal_bam_60,
         normal_bam_bai=rules.index_60.output.normal_bam_60_bai
     output:
-        out_vcf=temp(f'results/{patient}/calls/{sample}_{{gene}}_germline.vcf.gz')
+        out_vcf=temp(f'results/{patient}/calls/{sample}_germline.vcf.gz')
     shell:
         """
         gatk HaplotypeCaller \
@@ -147,7 +147,7 @@ rule filter_germline_mutations:
         hap_fa = rules.make_haplotype_ref.output.hap_fa,
         in_vcf = rules.call_germline_mutations.output.out_vcf
     output:
-        out_vcf = f"results/{patient}/calls/{sample}_{{gene}}_germline_filtered.vcf"
+        out_vcf = f"results/{patient}/calls/{sample}_germline_filtered.vcf"
     shell:
         """
         gatk VariantFiltration \
