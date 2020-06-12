@@ -77,8 +77,8 @@ rule realign_to_haplotype_ref:
     input:
         rules.make_haplotype_ref.output,
         hap_fa = rules.make_haplotype_ref.output.hap_fa,
-        fq1 = [x for x in fq1],
-        fq2 = [x for x in fq2]
+        fq1 = [x for x in fq1s],
+        fq2 = [x for x in fq2s]
     output:
         temp_fq1 = temp(f"temp/{sample}/{sample}_temp_1.fq"),
         temp_fq2 = temp(f"temp/{sample}/{sample}_temp_2.fq"),
@@ -87,8 +87,8 @@ rule realign_to_haplotype_ref:
         bam_bai = f"results/{patient}/alignments/{sample}/{sample}_haplotype_realigned.bam.bai",
         metrics = temp(f"temp/{sample}/{sample}_realigned_deduped_metrics.txt")
     params:
-        fq1 = " ".join([x for x in fq1]),
-        fq2 = " ".join([x for x in fq2]),
+        fq1 = " ".join([x for x in fq1s]),
+        fq2 = " ".join([x for x in fq2s]),
         read_group = lambda w: f"@RG\\tSM:{sample}\\tID:{sample}\\tPL:ILLUMINA\\tLB:{sample}"
     threads: NCORES
     shell:
