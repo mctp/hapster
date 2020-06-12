@@ -47,7 +47,7 @@ rule create_regions_list:
 
 rule make_haplotype_ref:
     input:
-        fa = [x for x in fasta_files],
+        fa = [x for x in fasta_files.values],
         haplotype = haplotype
     output:
         temp_fa = temp(f"temp/{sample}/fa_full.fa"),
