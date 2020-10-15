@@ -100,7 +100,7 @@ case "$1" in
             --directory $PWD \
             --cores $NCORES)
     ;;
-    germline_realignment)
+    germline_realign)
         args=( \
             --configfile $POLYTECT_DIR/config/$2.yaml \
             --config POLYTECT_DIR=$POLYTECT_DIR \
@@ -109,7 +109,7 @@ case "$1" in
                      sample=$4 \
                      germline_vcf=$5 \
                      ref=$6 \
-            --snakefile $POLYTECT_DIR/pipelines/call_germline_mutations.smk \
+            --snakefile $POLYTECT_DIR/pipelines/realign_to_germline_ref.smk \
             --directory $PWD \
             --cores $NCORES)
     ;;
