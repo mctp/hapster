@@ -118,7 +118,7 @@ rule filter_normal_kmers:
 
 rule run_csq:
     input:
-        germ_fa = germline_refs,
+        germ_fa = germline_ref,
         input_vcf=rules.filter_normal_kmers.output.out_vcf,
         input_gff= gff
     output:
