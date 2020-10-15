@@ -23,6 +23,8 @@ Commands:
               args:         [gene] [patient] [sample] [nm] [protocol] <dryrun>
 germline_mutations:     Calls germline mutations in polymorphic genes
               args:         [gene] [patient] [sample] [haplotype] <dryrun>
+  germline_realign:     Realigns reads to personalized ref with imputed germline variants
+              args:         [gene] [patient] [sample] [germline_vcf] [haplotype_ref] <dryrun>
   *	   Help
 "
   exit 1
@@ -94,6 +96,19 @@ case "$1" in
                      patient=$3 \
                      sample=$4 \
                      haplotype=$5 \
+            --snakefile $POLYTECT_DIR/pipelines/call_germline_mutations.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
+    germline_realignment)
+        args=( \
+            --configfile $POLYTECT_DIR/config/$2.yaml \
+            --config POLYTECT_DIR=$POLYTECT_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     germline_vcf=$5 \
+                     ref=$6 \
             --snakefile $POLYTECT_DIR/pipelines/call_germline_mutations.smk \
             --directory $PWD \
             --cores $NCORES)

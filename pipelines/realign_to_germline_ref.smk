@@ -20,8 +20,8 @@ genes = config['genes']
 
 rule all:
     input:
-        germline_ref = expand(f"results/{patient}/refs/{patient}_" + "{gene}_germline_imputed.fa", gene = genes),
-        germline_realigned_bam = expand(f"results/{patient}/alignments/{sample}_" + "{gene}_germline_imputed.bam", gene = genes)
+        germline_ref = f"results/{patient}/refs/{patient}_germline_imputed.fa",
+        germline_realigned_bam = f"results/{patient}/alignments/{sample}_germline_imputed.bam"
 
 rule make_germline_ref:
     input:
