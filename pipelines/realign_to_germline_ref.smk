@@ -4,19 +4,16 @@ from pathlib import Path
 PD = Path(config['POLYTECT_DIR'])
 NCORES = config['NCORES']
 
-#Inputs
+# inputs
 germline_vcf = config['germline_vcf']
 ref = config['ref']
-fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes]
-fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]
-
-#Sample information
 patient = config['patient']
 sample = config['sample']
 
-#Algorithm parameters
-threads = config['threads']
+# polytect global references
 genes = config['genes']
+fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes]
+fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]
 
 rule all:
     input:
