@@ -125,7 +125,7 @@ case "$1" in
                      tumor_bam=$7 \
                      germline_ref=$8 \
                      gff=$9 \
-                     normal_for_kmers=$10 \
+                     normal_for_kmers=${10} \
             --snakefile $POLYTECT_DIR/pipelines/call_somatic_mutations.smk \
             --directory $PWD \
             --cores $NCORES)
