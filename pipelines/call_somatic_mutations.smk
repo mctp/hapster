@@ -1,36 +1,35 @@
 import pysam
+import re
+import os
+from pathlib import Path
 
-configfile: "/home/mumphrey/Projects/hla_pipeline/config/call_somatic_mutations_config.yaml"
+# polytect runtime
+PD = Path(config['POLYTECT_DIR'])
+NCORES = config['NCORES']
 
-#Inputs
-germline_refs = config['germline_refs']
-tumor_bams = config['tumor_bams']
-normal_bams = config['normal_bams']
-gffs = config['gffs']
-normal_bam_for_kmers = config['normal_bam_for_kmers']
-
-#Sample information
+# inputs
 patient = config['patient']
 normal = config['normal']
+normal_bam = config['normal_bam']
 tumor = config['tumor']
-
-#Algorithm parameters
-threads = config['threads']
-genes = config['genes']
+tumor_bam = config['tumor_bam']
+germline_ref = config['germline_ref']
+gff = config['gff']
+original_normal_bam = config['original_normal_bam']
 
 rule all:
     input:
-        mutect_filtered = expand(f"results/{patient}/calls/{tumor}_{normal}_" + "{gene}_filtered.vcf", gene = genes),
-        kmer_filtered = expand(f"results/{patient}/calls/kmer_{tumor}_{normal}_" + "{gene}_filtered.vcf", gene = genes),
-        csq_annotated = expand(f"results/{patient}/calls/{tumor}_{normal}_" + "{gene}_annotated.txt", gene = genes)
+        mutect_filtered = f"results/{patient}/calls/{tumor}_{normal}_filtered.vcf",
+        kmer_filtered = f"results/{patient}/calls/kmer_{tumor}_{normal}_filtered.vcf",
+        csq_annotated = f"results/{patient}/calls/{tumor}_{normal}_annotated.txt"
 
 rule germline_mapq_to_60:
     input:
-        tumor_bam = lambda w: tumor_bams[w.gene],
-        normal_bam = lambda w: normal_bams[w.gene]
+        tumor_bam = tumor_bam,
+        normal_bam = normal_bam
     output:
-        tumor_bam_60=temp(f"temp/{tumor}/germline_{tumor}_{{gene}}_realigned_deduped_60.bam"),
-        normal_bam_60=temp(f"temp/{normal}/germline_{normal}_{{gene}}_realigned_deduped_60.bam")
+        tumor_bam_60=temp(f"temp/{tumor}/germline_{tumor}_realigned_deduped_60.bam"),
+        normal_bam_60=temp(f"temp/{normal}/germline_{normal}_realigned_deduped_60.bam")
     run:
         tumor_bam = pysam.AlignmentFile(input.tumor_bam, 'rb')
         tumor_bam_60 = pysam.AlignmentFile(output.tumor_bam_60, 'wb', template = tumor_bam)
@@ -58,14 +57,14 @@ rule germline_index_60:
 
 rule run_mutect2:
     input:
-        germ_fa = lambda w: germline_refs[w.gene],
+        germ_fa = germline_ref,
         tumor_bam = rules.germline_mapq_to_60.output.tumor_bam_60,
         normal_bam = rules.germline_mapq_to_60.output.normal_bam_60,
         tumor_bam_bai = rules.germline_index_60.output.tumor_bam_60_bai,
         normal_bam_bai = rules.germline_index_60.output.normal_bam_60_bai
     output:
-        out_vcf=temp(f'results/{patient}/calls/{tumor}_{normal}_{{gene}}_raw.vcf.gz'),
-        out_bam=temp(f'results/{patient}/calls/{tumor}_{normal}_{{gene}}_raw.bam')
+        out_vcf=temp(f'results/{patient}/calls/{tumor}_{normal}_raw.vcf.gz'),
+        out_bam=temp(f'results/{patient}/calls/{tumor}_{normal}_raw.bam')
     shell:
         """
         /home/mumphrey/Projects/hla_pipeline/bin/gatk-4.1.2.0/gatk --java-options "-Xmx2g" Mutect2 \
@@ -83,12 +82,12 @@ rule run_mutect2:
 
 rule filter_mutect2:
     input:
-        germ_fa = lambda w: germline_refs[w.gene],
+        germ_fa = germline_ref,
         in_vcf=rules.run_mutect2.output.out_vcf
     output:
-        out_vcf = f"results/{patient}/calls/{tumor}_{normal}_{{gene}}_filtered.vcf"
+        out_vcf = f"results/{patient}/calls/{tumor}_{normal}_filtered.vcf"
     params:
-        out_vcf_gz = f"results/{patient}/calls/{tumor}_{normal}_{{gene}}_filtered.vcf.gz"
+        out_vcf_gz = f"results/{patient}/calls/{tumor}_{normal}_filtered.vcf.gz"
     shell:
         """
         /home/mumphrey/Projects/hla_pipeline/bin/gatk-4.1.2.0/gatk --java-options "-Xmx2g" FilterMutectCalls \
@@ -104,9 +103,9 @@ rule filter_normal_kmers:
     input:
         in_vcf = rules.filter_mutect2.output.out_vcf,
         normal_bam = normal_bam_for_kmers,
-        germ_fa = lambda w: germline_refs[w.gene],
+        germ_fa = germline_ref
     output:
-        out_vcf = f"results/{patient}/calls/kmer_{tumor}_{normal}_{{gene}}_filtered.vcf"
+        out_vcf = f"results/{patient}/calls/kmer_{tumor}_{normal}_filtered.vcf"
     shell:
         """
         python /home/mumphrey/Projects/hla_pipeline/scripts/filter_normal_kmers.py \
@@ -119,11 +118,11 @@ rule filter_normal_kmers:
 
 rule run_csq:
     input:
-        germ_fa = lambda w: germline_refs[w.gene],
+        germ_fa = germline_refs,
         input_vcf=rules.filter_normal_kmers.output.out_vcf,
-        input_gff=lambda w: gffs[w.gene]
+        input_gff= gff
     output:
-        output_txt = f"results/{patient}/calls/{tumor}_{normal}_{{gene}}_annotated.txt"
+        output_txt = f"results/{patient}/calls/{tumor}_{normal}_annotated.txt"
     shell:
     	"""
     	bcftools csq \
