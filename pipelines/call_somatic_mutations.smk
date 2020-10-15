@@ -15,7 +15,7 @@ tumor = config['tumor']
 tumor_bam = config['tumor_bam']
 germline_ref = config['germline_ref']
 gff = config['gff']
-original_normal_bam = config['normal_for_kmers']
+normal_bam_for_kmers = config['normal_for_kmers']
 
 rule all:
     input:
