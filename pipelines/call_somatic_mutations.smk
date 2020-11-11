@@ -67,7 +67,7 @@ rule run_mutect2:
         out_bam=temp(f'results/{patient}/calls/{tumor}_{normal}_raw.bam')
     shell:
         """
-        /home/mumphrey/Projects/hla_pipeline/bin/gatk-4.1.2.0/gatk --java-options "-Xmx2g" Mutect2 \
+        gatk Mutect2 \
             -R {input.germ_fa} \
             -I {input.tumor_bam} \
             -I {input.normal_bam} \
@@ -90,7 +90,7 @@ rule filter_mutect2:
         out_vcf_gz = f"results/{patient}/calls/{tumor}_{normal}_filtered.vcf.gz"
     shell:
         """
-        /home/mumphrey/Projects/hla_pipeline/bin/gatk-4.1.2.0/gatk --java-options "-Xmx2g" FilterMutectCalls \
+        gatk FilterMutectCalls \
             -V {input.in_vcf} \
             -O {params.out_vcf_gz} \
             -R {input.germ_fa} \
@@ -108,7 +108,7 @@ rule filter_normal_kmers:
         out_vcf = f"results/{patient}/calls/kmer_{tumor}_{normal}_filtered.vcf"
     shell:
         """
-        python /home/mumphrey/Projects/hla_pipeline/scripts/filter_normal_kmers.py \
+        python {PD}/scripts/filter_normal_kmers.py \
             {input.in_vcf} \
             {input.normal_bam} \
             {input.germ_fa} \
