@@ -36,7 +36,7 @@ rule make_germline_ref:
         germ_dict = f"results/{patient}/refs/{patient}_germline_imputed.dict"
     shell:
         """
-        python /home/mumphrey/Projects/hla_pipeline/scripts/create_germline_ref.py {input.hap_fa} {input.vcf} {output.germ_fa}
+        python {PD}/scripts/create_germline_ref.py {input.hap_fa} {input.vcf} {output.germ_fa}
         """
 
 rule realign_to_germline_ref:
