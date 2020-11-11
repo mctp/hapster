@@ -11,6 +11,7 @@ patient = config['patient']
 sample = config['sample']
 aligned_file = config['aligned_file']
 cram_reference = config['cram_reference']
+extraction_regions = config['extraction_regions']
 
 # polytect global references
 genes = config['genes']
@@ -56,12 +57,13 @@ rule all:
 rule cram_to_bam:
     input:
         cram = aligned_file,
-        cram_reference = cram_reference
+        cram_reference = cram_reference,
+        extraction_regions = extraction_regions
     output:
         bam = temp(f"temp/{sample}/{sample}_original.bam")
     threads: NCORES
     shell:
-        "samtools view -hb -@ {threads} --reference {input.cram_reference} {input.cram} > {output.bam}"
+        "samtools view -hb -@ {threads} --reference {input.cram_reference} {input.cram} $(<{input.extraction_regions})> {output.bam}"
 
 # step 2: convert bam to fastq
 # Checkpoints used for dynamic output - we don't know how many pieces it will split into ahead of time
@@ -90,7 +92,7 @@ checkpoint unalign_reads_from_original:
             F2={params.fq2} \
             S={params.singles} \
             O={params.orphan1} \
-            split=10M \
+            split=10K \
             O2={params.orphan2}
         """
 
