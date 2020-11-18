@@ -257,11 +257,11 @@ rule make_rna_extraction_ref:
         """
 
 # Creates all kmers from all alt alleles for use in kmer read extraction
-rule make_kmers:
+rule make_dna_kmers:
     input:
         fastas = rules.consolidate_fastas.output.consolidated_fasta  
     output:
-        kmers = "{gene_prefix}/sim/kmers.txt"
+        kmers = "{gene_prefix}/sim/dna_kmers.txt"
     shell:
         """
         python scripts/gen_kmers.py {input.fastas} {output.kmers} 30 1
@@ -277,3 +277,22 @@ rule make_rna_kmers:
         """
         python scripts/gen_kmers.py {input.fastas} {output.kmers} 30 1
         """
+
+rule combine_kmers:
+    input:
+        dna_kmers = rules.make_dna_kmers.output.kmers,
+        rna_kmers = rules.make_rna_kmers.output.kmers
+    output:
+        combined_kmers = "{gene_prefix}/sim/kmers.txt"
+    run:
+        kmers = []
+        with open(input.dna_kmers, 'r') as f:
+            for line in f:
+                kmers.append(line.strip())
+        with open(input.rna_kmers, 'r') as f:
+            for line in f:
+                kmers.append(line.strip())
+        kmers = set(kmers)
+        with open(output.combined_kmers, 'w') as of:
+            for kmer in kmers:
+                of.write(f"{kmer}\n")
