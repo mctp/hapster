@@ -5,20 +5,14 @@ library(GenomicFeatures)
 library(BSgenome)
 library(foreach)
 
-##
-alt.fa <- list.files("refs/hs-hg38/hla/alts", full.names=TRUE, pattern="^[bA-Z].*.fa$")
-alt.gff <- list.files("refs/hs-hg38/hla/gff", full.names=TRUE, pattern="^[bA-Z].*.gff$")
+alt.fa <- snakemake@input[["fastas"]]
+alt.gff <- snakemake@input[["gffs"]]
+gene <- str_replace(basename(alt.fa), ".fa", "")
 
-genes <- mapply(list, alt.fa, alt.gff, SIMPLIFY=F)
-names(genes) <- str_replace(basename(alt.fa), ".fa", "")
-foreach(gene=names(genes)) %do% {
-    gene.fa <- genes[[gene]][[1]]
-    gene.gff <- genes[[gene]][[2]]
-    gene.seq <- readDNAStringSet(gene.fa)
-    gene.gr <- import(gene.gff)
-    gene.exon <- gene.gr[gene.gr$type %in% c("exon", "five_prime_UTR", "three_prime_UTR")]
-    gene.exon$type <- "exon"
-    gene.txs <- split(gene.exon, seqnames(gene.exon))
-    tx.seq <- extractTranscriptSeqs(gene.seq, gene.txs)
-    writeXStringSet(tx.seq, sprintf("refs/hs-hg38/hla/rna/%s.fa", gene))
-}
+seq <- readDNAStringSet(alt.fa)
+gr <- import(alt.gff)
+exon <- gr[gr$type %in% c("exon", "five_prime_UTR", "three_prime_UTR")]
+exon$type <- "exon"
+txs <- split(exon, seqnames(exon))
+txs.seq <- extractTranscriptSeqs(seq, txs)
+writeXStringSet(txs.seq, sprintf("refs/hs-hg38/hla/rna/%s.fa", gene))

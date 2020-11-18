@@ -25,6 +25,7 @@ rna_blacklist_fasta = Path(gene_prefix) / "rna" / "blacklist.fa"
 rule all:
     input:
         expand("{gene_prefix}/alts/{gene}.fa.fai", gene_prefix=gene_prefix, gene=genes),
+        expand("{gene_prefix}/rna/{gene}.fa", gene_prefix=gene_prefix, gene=genes),
         expand("{gene_prefix}/sim/kmers.txt", gene_prefix=gene_prefix),
         expand("{gene_prefix}/sim/rna_kmers.txt", gene_prefix=gene_prefix),
         expand("{gene_prefix}/sim/regions.txt", gene_prefix=gene_prefix),
@@ -37,11 +38,30 @@ rule all:
         expand("{gene_prefix}/fa/rna_complete.fa", gene_prefix=gene_prefix),
         expand("{gene_prefix}/fa/rna_complete.fa.alt", gene_prefix=gene_prefix)
 
+rule make_rna_fastas:
+    input:
+        fastas = f"{gene_prefix}/alts/{{gene}}.fa",
+        gffs = f"{gene_prefix}/gff/{{gene}}.gff"
+    output:
+        rna_fasta = f"{gene_prefix}/rna/{{gene}}.fa"
+    script:
+        "../scripts/gen_transcripts.R"
+
 rule index_fastas:
     input:
         fasta = f"{gene_prefix}/alts/{{gene}}.fa"
     output:
         faidx = f"{gene_prefix}/alts/{{gene}}.fa.fai"
+    shell:
+        """
+        samtools faidx {input.fasta}
+        """
+
+rule index_rna_fastas:
+    input:
+        fasta = f"{gene_prefix}/rna/{{gene}}.fa"
+    output:
+        faidx = f"{gene_prefix}/rna/{{gene}}.fa.fai"
     shell:
         """
         samtools faidx {input.fasta}
