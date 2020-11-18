@@ -59,7 +59,7 @@ rule index_fastas:
 
 rule index_rna_fastas:
     input:
-        fasta = f"{gene_prefix}/rna/{{gene}}.fa"
+        fasta = rules.make_rna_fastas.output.rna_fasta
     output:
         faidx = f"{gene_prefix}/rna/{{gene}}.fa.fai"
     shell:
