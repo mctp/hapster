@@ -47,7 +47,8 @@ rule realign_to_germline_ref:
     input:
         rules.make_rna_ref.output,
         fq1 = [x for x in fq1s],
-        fq2 = [x for x in fq2s]
+        fq2 = [x for x in fq2s],
+        gtf = gtf
     output:
         temp_fq1 = temp(f"temp/{sample}/{sample}_temp_1.fq"),
         temp_fq2 = temp(f"temp/{sample}/{sample}_temp_2.fq"),
@@ -69,6 +70,7 @@ rule realign_to_germline_ref:
             --readFilesIn {output.temp_fq1} {output.temp_fq2} \
             --outFileNamePrefix {params.prefix} \
             --outSAMtype BAM SortedByCoordinate \
-            --quantMode GeneCounts
+            --quantMode GeneCounts \
+            --sjdbGTFfile {input.gtf}
         samtools index {output.bam}
         """
