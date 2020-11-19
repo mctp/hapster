@@ -51,8 +51,8 @@ rule realign_to_germline_ref:
     output:
         temp_fq1 = temp(f"temp/{sample}/{sample}_temp_1.fq"),
         temp_fq2 = temp(f"temp/{sample}/{sample}_temp_2.fq"),
-        bam = f"results/{patient}/rna/{sample}.Aligned.sortedByCoord.out.bam",
-        bam_bai = f"results/{patient}/rna/{sample}.Aligned.sortedByCoord.out.bam.bai"
+        bam = f"results/{patient}/alignments/{sample}.Aligned.sortedByCoord.out.bam",
+        bam_bai = f"results/{patient}/alignments/{sample}.Aligned.sortedByCoord.out.bam.bai"
     params:
         fq1 = " ".join([x for x in fq1s]),
         fq2 = " ".join([x for x in fq2s]),
