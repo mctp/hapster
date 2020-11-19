@@ -26,7 +26,7 @@ rule make_rna_ref:
         hap_fa = ref,
         gtf = gtf
     output:
-        star_index = f"results/{patients}/refs/{sample}_rna/SAindex"
+        star_index = f"results/{patient}/refs/{sample}_rna/SAindex"
     params:
         genome_dir = f"results/{patient}/refs/{sample}_rna"
     threads: NCORES
