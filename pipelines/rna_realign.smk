@@ -38,9 +38,9 @@ rule make_rna_ref:
             --genomeDir {params.genome_dir} \
             --genomeFastaFiles {input.hap_fa} \
             --runThreadN {threads} \
-            -sjdbOverhang 125 \
-            -sjdbScore 2 \
-            -sjdbGTFfile {input.gtf}
+            --sjdbOverhang 125 \
+            --sjdbScore 2 \
+            --sjdbGTFfile {input.gtf}
         """
 
 rule realign_to_germline_ref:
