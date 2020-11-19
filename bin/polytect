@@ -130,6 +130,18 @@ case "$1" in
             --directory $PWD \
             --cores $NCORES)
     ;;
+    rna_realign_bwa)
+        args=( \
+            --configfile $POLYTECT_DIR/config/$2.yaml \
+            --config POLYTECT_DIR=$POLYTECT_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     haplotype=$5 \
+            --snakefile $POLYTECT_DIR/pipelines/rna_realign_bwa.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
     somatic_mutations)
         args=( \
             --configfile $POLYTECT_DIR/config/$2.yaml \
