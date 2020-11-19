@@ -15,6 +15,11 @@ fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq"
 fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]
 fasta_files = [str(PD / config['gene_prefix'] / "rna" / f"{gene}.fa") for gene in genes]
 
+#Derived variables
+with open(haplotype, 'r') as f:
+    alleles = next(f).strip().split(',')[1:]
+    haplotype_string = ' '.join(alleles)
+
 rule all:
     input:
         hap_fa_saved = f"results/{patient}/refs/{sample}_transcripts.fa",
