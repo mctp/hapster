@@ -31,6 +31,7 @@ rule all:
         expand("{gene_prefix}/sim/regions.txt", gene_prefix=gene_prefix),
         expand("{gene_prefix}/sim/rna_regions.txt", gene_prefix=gene_prefix),
         expand("{gene_prefix}/gff/alt_genes.gff", gene_prefix=gene_prefix),
+        expand("{gene_prefix}/gff/alt_genes.gtf", gene_prefix=gene_prefix),
         expand("{gene_prefix}/fa/extraction.fa", gene_prefix=gene_prefix),
         expand("{gene_prefix}/fa/rna_extraction.fa", gene_prefix=gene_prefix),
         expand("{gene_prefix}/fa/complete.fa", gene_prefix=gene_prefix),
@@ -107,6 +108,17 @@ rule consolidate_gffs:
     shell:
         """
         cat {input.gffs} >> {output.full_gff}
+        """
+
+#Makes GTF for use with STAR
+rule make_gtf:
+    input:
+        gff = rules.consolidate_gffs.output.full_gff
+    output:
+        gtf = "{gene_prefix}/gff/alt_genes.gtf"
+    shell:
+        """
+        gffread -E -F -T {input.gff} -o {output.gtf}
         """
 
 # Makes a single fasta for later use with the somatic mutation consequence caller
