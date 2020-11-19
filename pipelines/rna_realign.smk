@@ -70,7 +70,6 @@ rule realign_to_germline_ref:
             --readFilesIn {output.temp_fq1} {output.temp_fq2} \
             --outFileNamePrefix {params.prefix} \
             --outSAMtype BAM SortedByCoordinate \
-            --quantMode GeneCounts \
-            --sjdbGTFfile {input.gtf}
+            --quantMode GeneCounts
         samtools index {output.bam}
         """
