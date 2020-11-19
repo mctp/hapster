@@ -17,7 +17,7 @@ fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq"
 
 rule all:
     input:
-        star_index = f"results/{patients}/refs/{sample}_rna/SAindex",
+        star_index = f"results/{patient}/refs/{sample}_rna/SAindex",
         bam = f"results/{patient}/rna/{sample}.Aligned.sortedByCoord.out.bam",
         bam_bai = f"results/{patient}/rna/{sample}.Aligned.sortedByCoord.out.bam.bai"
 
