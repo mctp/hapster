@@ -56,7 +56,7 @@ rule make_haplotype_ref:
 rule realign_to_germline_ref:
     input:
         rules.make_haplotype_ref.output,
-        hap_fa = rules.make_haplotype_ref.output.hap_fa_saved,
+        hap_fa = rules.make_haplotype_ref.output.hap_fa,
         fq1 = [x for x in fq1s],
         fq2 = [x for x in fq2s]
     output:
