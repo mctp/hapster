@@ -75,7 +75,7 @@ rule realign_to_germline_ref:
         """
         for FQ in $(echo {params.fq1}); do if (( $(stat -c%s "$FQ") > 25 )); then cat $FQ >> {output.temp_fq1}; fi; done; 
         for FQ in $(echo {params.fq2}); do if (( $(stat -c%s "$FQ") > 25 )); then cat $FQ >> {output.temp_fq2}; fi; done;
-        bwa mem -t 4 {input.germ_fa} {output.temp_fq1} {output.temp_fq2} -R "{params.read_group}" | \
+        bwa mem -t 4 {input.hap_fa} {output.temp_fq1} {output.temp_fq2} -R "{params.read_group}" | \
             samtools sort -@ 4 | \
             samtools view -@ 4 -hb > {output.bam}
         picard MarkDuplicates I={output.bam} O={output.deduped_bam} M={output.metrics}
