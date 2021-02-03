@@ -42,7 +42,7 @@ if bambam_format == "cram":
     bambam_file = f"temp/{sample}/{sample}_original.bam"
     bambam_format = "bam"
 elif bambam_format == "bam" or bambam_format == "sam":
-    bambam_file = aligned_file
+    bambam_file = f"temp/{sample}/{sample}_ra.bam"
 
 rule all:
     input:
@@ -64,6 +64,16 @@ rule cram_to_bam:
     threads: NCORES
     shell:
         "samtools view -hb -@ {threads} --reference {input.cram_reference} {input.cram} $(<{input.extraction_regions})> {output.bam}"
+
+rule bam_regions:
+    input:
+        bam = aligned_file,
+        extraction_regions = extraction_regions
+    output:
+        bam = temp(f"temp/{sample}/{sample}_ra.bam")
+    threads: NCORES
+    shell:
+        "samtools view -hb -@ {threads} {input.bam} $(<{input.extraction_regions})> {output.bam}"
 
 # step 2: convert bam to fastq
 # Checkpoints used for dynamic output - we don't know how many pieces it will split into ahead of time
