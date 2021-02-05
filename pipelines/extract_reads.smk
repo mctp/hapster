@@ -355,8 +355,8 @@ rule unalign_reads:
 
 rule consolidate_reads:
     input:
-        fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes],
-        fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]
+        fq1s = expand(f"results/{patient}/seqs/{sample}/{sample}_" + "{gene}_1.fq", gene = genes),
+        fq2s = expand(f"results/{patient}/seqs/{sample}/{sample}_" + "{gene}_2.fq", gene = genes)
     output:
         fq1_consolidated = f"results/{patient}/seqs/{sample}_1.fq",
         fq2_consolidated = f"results/{patient}/seqs/{sample}_2.fq"
