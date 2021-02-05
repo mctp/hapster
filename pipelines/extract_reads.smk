@@ -15,6 +15,8 @@ extraction_regions = config['extraction_regions']
 
 # polytect global references
 genes = config['genes']
+fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes]
+fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]
 kmers = PD / config['gene_prefix'] / "sim" / "kmers.txt"
 regions = PD / config['gene_prefix'] / "sim" / "regions.txt"
 complete_reference = PD / config['gene_prefix'] / "fa" / "complete.fa"
@@ -358,6 +360,9 @@ rule consolidate_reads:
     output:
         fq1_consolidated = f"results/{patient}/seqs/{sample}_1.fq",
         fq2_consolidated = f"results/{patient}/seqs/{sample}_2.fq"
+    params:
+        fq1 = " ".join([x for x in fq1s]),
+        fq2 = " ".join([x for x in fq2s])
     shell:
         """
         for FQ in $(echo {params.fq1}); do if (( $(stat -c%s "$FQ") > 25 )); then cat $FQ >> {output.fq1_consolidated}; fi; done; 
