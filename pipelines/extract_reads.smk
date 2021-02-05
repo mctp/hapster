@@ -49,7 +49,9 @@ rule all:
         bam_for_kmer_filter = f"results/{patient}/alignments/{sample}/{sample}_extracted_with_blacklist.bam",
         fq1 = expand(f"results/{patient}/seqs/{sample}/{sample}_" + "{gene}_1.fq", gene = genes),
         fq2 = expand(f"results/{patient}/seqs/{sample}/{sample}_" + "{gene}_2.fq", gene = genes),
-        bam = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_complete.bam", gene = genes)
+        bam = expand(f"results/{patient}/alignments/{sample}/{sample}_" + "{gene}_complete.bam", gene = genes),
+        fq1_consolidated = f"results/{patient}/seqs/{sample}_1.fq"),
+        fq2_consolidated = f"results/{patient}/seqs/{sample}_2.fq")
 
 # step 1 (optional): convert cram to bam
 # this is required because bamtofastq breaks on some cram files
@@ -348,3 +350,16 @@ rule unalign_reads:
         bam.close()
         paired_bam.close()
         subprocess.call(['bedtools', 'bamtofastq', '-i', output.out_bam, '-fq', output.fq1, '-fq2', output.fq2])
+
+rule consolidate_reads:
+    input:
+        fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes],
+        fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]
+    output:
+        fq1_consolidated = f"results/{patient}/seqs/{sample}_1.fq"),
+        fq2_consolidated = f"results/{patient}/seqs/{sample}_2.fq")
+    shell:
+        """
+        for FQ in $(echo {params.fq1}); do if (( $(stat -c%s "$FQ") > 25 )); then cat $FQ >> {output.fq1_consolidated}; fi; done; 
+        for FQ in $(echo {params.fq2}); do if (( $(stat -c%s "$FQ") > 25 )); then cat $FQ >> {output.fq2_consolidated}; fi; done;
+        """
