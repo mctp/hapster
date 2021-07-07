@@ -1,8 +1,8 @@
-# Polytect
+# Hapster
 
 ## Installation
 
-Polytect is developed and tested on Ubuntu 18.04, but should work on modern Linux distributions.
+Hapster is developed and tested on Ubuntu 18.04, but should work on modern Linux distributions.
 
 ### Pre-requisites
 
@@ -11,7 +11,7 @@ Polytect is developed and tested on Ubuntu 18.04, but should work on modern Linu
 - gcc tool chain to compile programs
 - unzip
 
-### Setup Polytect base directory
+### Setup Hapster base directory
 
 Clone repository from github:
 ```bash
@@ -26,7 +26,7 @@ PATH=$PWD/bin:$PATH
 
 ### Setup External Dependencies
 
-Polytect depends on a number of dependencies managed by conda and select ones which are not: GATK4, hpseq, biobambam2 and bwa.kit.
+Hapster depends on a number of dependencies managed by conda and select ones which are not: GATK4, hpseq, biobambam2 and bwa.kit.
 
 - bwa.kit (==0.7.15) No other version supported.
   (https://sourceforge.net/projects/bio-bwa/files/bwakit/)  
