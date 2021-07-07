@@ -12,7 +12,6 @@ Hapster is developed and tested on Ubuntu 18.04, but should work on modern Linux
 - unzip
 - R >= 3.2
 - R packages:
-  - stringr
   - rtracklayer
   - Biostrings
   - GenomicFeatures
@@ -21,6 +20,7 @@ Hapster is developed and tested on Ubuntu 18.04, but should work on modern Linux
   - readr
   - dplyr
   - tibble
+  - stringr
 
 ### Setup Hapster base directory
 
