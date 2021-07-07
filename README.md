@@ -10,6 +10,17 @@ Hapster is developed and tested on Ubuntu 18.04, but should work on modern Linux
 - Miniconda3 (https://docs.conda.io/en/latest/miniconda.html)
 - gcc tool chain to compile programs
 - unzip
+- R
+- R packages:
+  - stringr
+  - rtracklayer
+  - Biostrings
+  - GenomicFeatures
+  - BSgenome
+  - foreach 
+  - readr
+  - dplyr
+  - tibble
 
 ### Setup Hapster base directory
 
