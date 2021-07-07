@@ -15,12 +15,12 @@ Hapster is developed and tested on Ubuntu 18.04, but should work on modern Linux
 
 Clone repository from github:
 ```bash
-git clone https://github.com/mctp/polytect
+git clone https://github.com/mctp/hapster
 ```
 
-Modify path to get access to `polytect` command:
+Modify path to get access to `hapster` command:
 ```bash
-cd polytect
+cd hapster
 PATH=$PWD/bin:$PATH
 ```
 
@@ -40,25 +40,25 @@ Hapster depends on a number of dependencies managed by conda and select ones whi
 These dependencies are included in the provided tools resources bundle.
 
 ```bash
-wget https://storage.googleapis.com/mctp-open-share/polytect/tools-1.0.0.tar.gz --directory-prefix=resources
-polytect setup_tools
+wget https://storage.googleapis.com/mctp-open-share/hapster/tools-1.0.0.tar.gz --directory-prefix=resources
+hapster setup_tools
 ```
 
 ### Running
 
-Before you can use any of the polytect commands, you need to activate the Conda environment and setup path.
+Before you can use any of the hapster commands, you need to activate the Conda environment and setup path.
 
 ```bash
-conda activate polytect
+conda activate hapster
 ```
 
 ### Setup references
 
 ```bash
-conda activate polytect
-wget https://storage.googleapis.com/mctp-open-share/polytect/hs-hg38-1.0.1.tar.gz --directory-prefix=resources
+conda activate hapster
+wget https://storage.googleapis.com/mctp-open-share/hapster/hs-hg38-1.0.1.tar.gz --directory-prefix=resources
 tar --strip 1 -xf resources/hs-hg38-1.0.1.tar.gz -C refs
-polytect make_refs hs-hg38-hla
+hapster make_refs hs-hg38-hla
 ```
 ### Simulate likelihood matrices
 
@@ -77,7 +77,7 @@ This module expects a set of reference files that can be created with the make_r
   ```
   # sample command for whole genome sequencing
   # make_matrices [gene] [protocol] [min_insert_length] [max_insert_length] [read_length] [n_reads] [nm]
-  polytect make_matrices hs-hg38-hla wgs 151 674 151 2000 1
+  hapster make_matrices hs-hg38-hla wgs 151 674 151 2000 1
   ```
 
 ### Extract reads specific to the region of interest
@@ -90,8 +90,8 @@ To improve run time for later parts of the algorithm, we extract reads specific 
 
 This module expects a set of reference files that can be created with the make_refs module.
 ```
-# polytect extract_reads [gene] [patient] [sample] [aligned_file] <cram_reference>
-polytect extract_reads hs-hg38-hla patient1 sample1 /path/to/sample1.bam
+# hapster extract_reads [gene] [patient] [sample] [aligned_file] <cram_reference>
+hapster extract_reads hs-hg38-hla patient1 sample1 /path/to/sample1.bam
 ```
 ### Infer haplotype
 If haplotyping has already been done, this step can be skipped. Otherwise, the command can be run with the following inputs:
@@ -103,8 +103,8 @@ If haplotyping has already been done, this step can be skipped. Otherwise, the c
 
 This module expects a set of reference files that can be created with the make_refs module, and a set of extracted BAMs that can be produced with the extract_reads module.
 ```
-# polytect infer_haplotype [gene] [patient] [sample] [nm] [protocol]
-polytect infer_haplotype hs-hg38-hla patient1 sample1 1 wgs
+# hapster infer_haplotype [gene] [patient] [sample] [nm] [protocol]
+hapster infer_haplotype hs-hg38-hla patient1 sample1 1 wgs
 ```
 
 ### Call germline mutations
@@ -116,6 +116,6 @@ Calls germline mutations relative to a haplotype reference. This can be either p
 
 This module expects a set of reference files that can be created with the make_refs module, and a set of extracted BAMs that can be produced with the extract_reads module.
 ```
-# polytect germline_mutations [gene] [patient] [sample] [haplotype]
-polytect germline_mutations hs-hg38-hla patient1 sample1 /path/to/haplotype.csv
+# hapster germline_mutations [gene] [patient] [sample] [haplotype]
+hapster germline_mutations hs-hg38-hla patient1 sample1 /path/to/haplotype.csv
 ```
