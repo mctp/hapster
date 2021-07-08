@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+set -e
+export HAPSTER_DIR=$(cd $(dirname $(dirname $0)) && pwd)
+export NCORES=$(nproc --all)
+
+cli_help() {
+  cli_name=${0##*/}
+  echo "Usage: $cli_name [command] <gene> <args>
+Help: $cli_name help
+  
+Supported genes:
+  hs-hg38-hla   Variant calling of Hsapiens HLA genes
+Commands:
+       setup_tools:	    Setup required tools
+              args:	
+         make_refs:	    Make all required reference files
+              args:	        [gene] <dryrun>  
+     make_matrices:	    Similate haplotyping matrices
+              args:	        [gene] [protocol] [min_insert_length] [max_insert_length] [read_length] [n_reads] [nm] [capture_targets] [similarity] <dryrun>
+     extract_reads:	    Extract reads for polymorphic genes
+              args:         [gene] [patient] [sample] [aligned_file] [extraction_regions] <cram_reference> <dryrun>
+   infer_haplotype:     Infers haplotype for polymorphic genes
+              args:         [gene] [patient] [sample] [nm] [protocol] <dryrun>
+germline_mutations:     Calls germline mutations in polymorphic genes
+              args:         [gene] [patient] [sample] [haplotype] <dryrun>
+  dna_realign:     Realigns DNA sequencing reads to personalized ref with imputed germline variants
+              args:         [gene] [patient] [sample] [germline_vcf] [haplotype_ref] <dryrun>
+  rna_realign:     Realigns RNA sequencing reads to personalized ref
+              args:         [gene] [patient] [sample] [haplotype_ref] <dryrun>
+ somatic_mutations:     Call somatic mutations using mutect2
+              args:         [gene] [patient] [normal_sample] [normal_alignment] [tumor_sample] [tumor_alignment] [germline_ref] [gff] [normal_for_kmers] <dryrun>
+  *	   Help
+"
+  exit 1
+}
+
+#${@: -1} checks trailing arg, used to look for dryrun tag
+case "$1" in
+    setup_tools)
+        TOOLS_VER=1.0.0 ## TODO: refactor or remove versioning
+        tar -xvf $HAPSTER_DIR/resources/tools-$TOOLS_VER.tar.gz -C $HAPSTER_DIR/build --skip-old-files
+        bash $HAPSTER_DIR/build/tools-$TOOLS_VER/setup-tools.sh
+        exit 0
+    ;;
+    make_refs)
+        args=( \
+            --configfile $HAPSTER_DIR/config/$2.yaml \
+            --snakefile $HAPSTER_DIR/pipelines/make_refs.smk \
+            --directory $HAPSTER_DIR \
+            --cores $NCORES)
+    ;;
+    extract_reads)
+        args=( \
+            --configfile $HAPSTER_DIR/config/$2.yaml \
+            --config HAPSTER_DIR=$HAPSTER_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     aligned_file=$5 \
+                     extraction_regions=$6 \
+                     cram_reference=$7 \
+            --snakefile $HAPSTER_DIR/pipelines/extract_reads.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
+    make_matrices)
+        args=( \
+            --configfile $HAPSTER_DIR/config/$2.yaml \
+            --config HAPSTER_DIR=$HAPSTER_DIR \
+                     NCORES=$NCORES \
+                     protocol=$3 \
+                     min_insert_length=$4 \
+                     max_insert_length=$5 \
+                     read_length=$6 \
+                     n_reads=$7 \
+                     nm=$8 \
+                     capture_targets=$9 \
+                     similarity=${10} \
+            --snakefile $HAPSTER_DIR/pipelines/make_matrices.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
+    infer_haplotype)
+        args=( \
+            --configfile $HAPSTER_DIR/config/$2.yaml \
+            --config HAPSTER_DIR=$HAPSTER_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     nm=$5 \
+                     protocol=$6 \
+            --snakefile $HAPSTER_DIR/pipelines/infer_haplotype.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
+    germline_mutations)
+        args=( \
+            --configfile $HAPSTER_DIR/config/$2.yaml \
+            --config HAPSTER_DIR=$HAPSTER_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     haplotype=$5 \
+            --snakefile $HAPSTER_DIR/pipelines/call_germline_mutations.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
+    dna_realign)
+        args=( \
+            --configfile $HAPSTER_DIR/config/$2.yaml \
+            --config HAPSTER_DIR=$HAPSTER_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     germline_vcf=$5 \
+                     ref=$6 \
+            --snakefile $HAPSTER_DIR/pipelines/realign_to_germline_ref.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
+    rna_realign)
+        args=( \
+            --configfile $HAPSTER_DIR/config/$2.yaml \
+            --config HAPSTER_DIR=$HAPSTER_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     ref=$5 \
+            --snakefile $HAPSTER_DIR/pipelines/rna_realign.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
+    rna_realign_bwa)
+        args=( \
+            --configfile $HAPSTER_DIR/config/$2.yaml \
+            --config HAPSTER_DIR=$HAPSTER_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     haplotype=$5 \
+            --snakefile $HAPSTER_DIR/pipelines/rna_realign_bwa.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
+    somatic_mutations)
+        args=( \
+            --configfile $HAPSTER_DIR/config/$2.yaml \
+            --config HAPSTER_DIR=$HAPSTER_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     normal=$4 \
+                     normal_bam=$5 \
+                     tumor=$6 \
+                     tumor_bam=$7 \
+                     germline_ref=$8 \
+                     gff=$9 \
+                     normal_for_kmers=${10} \
+            --snakefile $HAPSTER_DIR/pipelines/call_somatic_mutations.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
+    tune_parameters)
+        args=( \
+            --configfile $HAPSTER_DIR/config/$2.yaml \
+            --config HAPSTER_DIR=$HAPSTER_DIR \
+                     NCORES=$NCORES \
+                     protocol=$3 \
+                     patient=$4 \
+                     sample=$5 \
+                     aligned_file=$6 \
+                     cram_reference=$7 \
+                     nm=$8 \
+            --snakefile $HAPSTER_DIR/pipelines/tune_parameters.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
+    help|"")
+        cli_help
+    ;;
+    *)
+        echo -e "Command not supported.\n"
+        cli_help
+    ;;
+esac
+
+case ${@: -1} in
+    dryrun)
+    args=(${args[@]} --dryrun)
+    ;;
+esac
+
+snakemake "${args[@]}"
