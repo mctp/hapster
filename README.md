@@ -51,7 +51,7 @@ Hapster depends on a number of dependencies managed by conda and select ones whi
 These dependencies are included in the provided tools resources bundle.
 
 ```bash
-wget https://storage.googleapis.com/mctp-open-share/hapster/tools-1.0.0.tar.gz --directory-prefix=resources
+wget https://storage.googleapis.com/mctp-open-share/hapster/tools-1.0.1.tar.gz --directory-prefix=resources
 hapster setup_tools
 ```
 
