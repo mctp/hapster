@@ -67,8 +67,8 @@ conda activate hapster
 
 ```bash
 conda activate hapster
-wget https://storage.googleapis.com/mctp-open-share/hapster/hs-hg38-1.0.1.tar.gz --directory-prefix=resources
-tar --strip 1 -xf resources/hs-hg38-1.0.1.tar.gz -C refs
+wget https://storage.googleapis.com/mctp-open-share/hapster/hs-hg38-1.0.2.tar.gz --directory-prefix=resources
+tar --strip 1 -xf resources/hs-hg38-1.0.2.tar.gz -C refs
 hapster make_refs hs-hg38-hla
 ```
 ### Simulate likelihood matrices
