@@ -86,7 +86,7 @@ If using the haplotyping module, you must first simulate matrices that represent
   
 This module expects a set of reference files that can be created with the make_refs module.  
   
-NOTE: This is just an example command. There are no defaults for min_insert_length and max_insert_length, this must be determined from the sequencing experiment being simulated.
+NOTE: This is just an example command. There are no defaults for min_insert_length and max_insert_length, or read_length. These must be determined from the sequencing experiment being simulated.
   ```
   # sample command for whole genome sequencing
   # make_matrices [gene] [protocol] [min_insert_length] [max_insert_length] [read_length] [n_reads] [nm]
