@@ -3,8 +3,8 @@ import re
 import os
 from pathlib import Path
 
-# polytect runtime
-PD = Path(config['POLYTECT_DIR'])
+# hapster runtime
+PD = Path(config['HAPSTER_DIR'])
 NCORES = config['NCORES']
 
 # inputs

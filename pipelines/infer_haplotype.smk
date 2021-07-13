@@ -3,8 +3,8 @@ import pysam
 from Bio import SeqIO
 from pathlib import Path
 
-# polytect runtime
-PD = Path(config['POLYTECT_DIR'])
+# hapster runtime
+PD = Path(config['HAPSTER_DIR'])
 NCORES = config['NCORES']
 
 #inputs
@@ -13,7 +13,7 @@ sample = config['sample']
 nm = config['nm']
 protocol = config['protocol']
 
-# polytect global references
+# hapster global references
 genes = config['genes']
 fasta_files = {gene: str(PD / config['gene_prefix'] / "alts" / f"{gene}.fa") for gene in genes}
 bams = {gene: str(PD / "results" / patient / "alignments" / sample / f"{sample}_{gene}_complete.bam") for gene in genes}

@@ -8,8 +8,8 @@ import pysam
 from Bio import SeqIO
 from pathlib import Path
 
-# polytect runtime
-PD = Path(config['POLYTECT_DIR'])
+# hapster runtime
+PD = Path(config['HAPSTER_DIR'])
 NCORES = config['NCORES']
 
 #inputs
@@ -22,7 +22,7 @@ nm = config['nm']
 capture_targets = config['capture_targets']
 similarity = config['similarity']
 
-# polytect global references
+# hapster global references
 genes = config['genes']
 fasta_files = {gene: str(PD / config['gene_prefix'] / "alts" / f"{gene}.fa") for gene in genes}
 regions = str(PD / config['gene_prefix'] / "sim" / "regions.txt")

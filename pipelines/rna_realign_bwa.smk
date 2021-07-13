@@ -1,7 +1,7 @@
 from pathlib import Path
 
-# polytect runtime
-PD = Path(config['POLYTECT_DIR'])
+# hapster runtime
+PD = Path(config['HAPSTER_DIR'])
 NCORES = config['NCORES']
 
 # inputs
@@ -9,7 +9,7 @@ patient = config['patient']
 sample = config['sample']
 haplotype = config['haplotype']
 
-# polytect global references
+# hapster global references
 genes = config['genes']
 fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes]
 fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]

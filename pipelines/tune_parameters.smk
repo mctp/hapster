@@ -9,8 +9,8 @@ cutoffs = [x/100 for x in range(70, 100, 1)]
 
 configfilename = workflow.overwrite_configfiles[0]
 
-# polytect runtime
-PD = Path(config['POLYTECT_DIR'])
+# hapster runtime
+PD = Path(config['HAPSTER_DIR'])
 NCORES = config['NCORES']
 
 #Inputs
@@ -47,7 +47,7 @@ rule extract_reads:
         """
         snakemake --unlock \
             --configfile {configfilename} \
-            --config POLYTECT_DIR={PD} \
+            --config HAPSTER_DIR={PD} \
                      NCORES={NCORES} \
                      patient={patient} \
                      sample={sample} \
@@ -58,7 +58,7 @@ rule extract_reads:
             --cores {NCORES}
         snakemake \
             --configfile {configfilename} \
-            --config POLYTECT_DIR={PD} \
+            --config HAPSTER_DIR={PD} \
                      NCORES={NCORES} \
                      patient={patient} \
                      sample={sample} \
@@ -81,7 +81,7 @@ rule infer_haplotype:
         """
         snakemake --unlock \
             --configfile {configfilename} \
-            --config POLYTECT_DIR={PD} \
+            --config HAPSTER_DIR={PD} \
                      NCORES={NCORES} \
                      patient={patient} \
                      sample={sample} \
@@ -93,7 +93,7 @@ rule infer_haplotype:
             --cores {NCORES}
         snakemake \
             --configfile {configfilename} \
-            --config POLYTECT_DIR={PD} \
+            --config HAPSTER_DIR={PD} \
                      NCORES={NCORES} \
                      patient={patient} \
                      sample={sample} \
@@ -122,7 +122,7 @@ rule call_germline_mutations:
         """
         snakemake \
             --configfile {configfilename} \
-            --config POLYTECT_DIR={PD} \
+            --config HAPSTER_DIR={PD} \
                      NCORES={NCORES} \
                      patient={patient} \
                      sample={sample} \
@@ -132,7 +132,7 @@ rule call_germline_mutations:
             --cores {NCORES}
         snakemake --unlock \
             --configfile {configfilename} \
-            --config POLYTECT_DIR={PD} \
+            --config HAPSTER_DIR={PD} \
                      NCORES={NCORES} \
                      patient={patient} \
                      sample={sample} \
