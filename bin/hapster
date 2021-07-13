@@ -37,7 +37,7 @@ germline_mutations:     Calls germline mutations in polymorphic genes
 #${@: -1} checks trailing arg, used to look for dryrun tag
 case "$1" in
     setup_tools)
-        TOOLS_VER=1.0.0 ## TODO: refactor or remove versioning
+        TOOLS_VER=1.0.1 ## TODO: refactor or remove versioning
         tar -xvf $HAPSTER_DIR/resources/tools-$TOOLS_VER.tar.gz -C $HAPSTER_DIR/build --skip-old-files
         bash $HAPSTER_DIR/build/tools-$TOOLS_VER/setup-tools.sh
         exit 0
