@@ -99,6 +99,7 @@ To improve run time for later parts of the algorithm, we extract reads specific 
  - patient: patient ID
  - sample: sample ID
  - aligned_file: filepath to alignment we are extracting reads from
+ - extraction_regions: BED file containing the regions to be extracted from the original aligned file
  - cram_reference: filepath to reference used to generate a cram file, only required if extracting reads from a .cram file
 
 This module expects a set of reference files that can be created with the make_refs module.
