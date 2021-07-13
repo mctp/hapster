@@ -103,8 +103,8 @@ To improve run time for later parts of the algorithm, we extract reads specific 
 
 This module expects a set of reference files that can be created with the make_refs module.
 ```
-# hapster extract_reads [gene] [patient] [sample] [aligned_file] <cram_reference>
-hapster extract_reads hs-hg38-hla patient1 sample1 /path/to/sample1.bam
+# hapster extract_reads [gene] [patient] [sample] [aligned_file] [extraction_regions] <cram_reference>
+hapster extract_reads hs-hg38-hla patient1 sample1 /path/to/sample1.bam /path/to/extraction/regions.bed
 ```
 ### Infer haplotype
 If haplotyping has already been done, this step can be skipped. Otherwise, the command can be run with the following inputs:
