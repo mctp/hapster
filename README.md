@@ -132,3 +132,17 @@ This module expects a set of reference files that can be created with the make_r
 # hapster germline_mutations [gene] [patient] [sample] [haplotype]
 hapster germline_mutations hs-hg38-hla patient1 sample1 /path/to/haplotype.csv
 ```
+
+### Realign to imputed germline reference
+Realigns DNA sequencing reads to the new haplotype reference with imputed novel germline variants. This needs to be done for both the tumor and the normal. The command can be run with the following inputs:
+ - gene: gene name
+ - patient: patient ID
+ - sample: sample ID
+ - germline_vcf: The VCF created by the germline_mutations function
+ - haplotype_ref: The haplotype reference fasta created by the germline_mutations function
+
+This module expects a set of reference files that can be created with the make_refs module, and a set of extracted BAMs that can be produced with the extract_reads module.
+```
+# hapster dna_realign [gene] [patient] [sample] [germline_vcf] [haplotype_ref]
+hapster dna_realign hs-hg38-hla patient1 sample1 /path/to/germline.vcf /path/to/hapotype.fa
+```
