@@ -18,7 +18,7 @@ make_sym <- function(nm, gene) {
     rbind(c("", names(likelihoods)), ., stringsAsFactors = FALSE)
   
   write_csv(likelihoods_mean, matrix_filename,
-            col_names = FALSE, quote_escape = FALSE)
+            col_names = FALSE, escape = "none")
 }
 
 make_sym(matrix_raw_filename, matrix_filename)
