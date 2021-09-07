@@ -90,7 +90,7 @@ type_alleles <- function(likelihoods, counts, haplotype_filename, cutoff) {
   denoised_reads <- sort(denoised_reads, decreasing = TRUE)[1:2]
   haplotype <- names(denoised_reads)
 
-  readr::write_csv(tibble(hap = haplotype), haplotype_filename, col_names = FALSE)
+  readr::write_csv(tibble(hap = haplotype) %>% arrange(hap), haplotype_filename, col_names = FALSE)
 }
 
 type_alleles(likelihoods, counts, haplotype_filename, cutoff)
