@@ -142,7 +142,7 @@ rule remove_ignored:
         orphan2 = temp(f"temp/sim/{{gene}}/{{allele}}_orphans_2_2.fq")
     shell:
         """
-        bwa mem {input.extraction_ref} {input.fq1} {input.fq2} | \
+        bwa mem {input.extraction_ref} -h 5,1000 {input.fq1} {input.fq2} | \
             samtools sort > {output.extracted_sorted_bam}
         samtools index {output.extracted_sorted_bam}
         samtools view -hb {output.extracted_sorted_bam} {full_regions} > {output.no_ignored_bam}
@@ -156,7 +156,7 @@ rule remove_ignored:
             S={output.singles} \
             O={output.orphan1} \
             O2={output.orphan2}
-        bwa mem {input.full_ref} {output.fq1} {output.fq2} | \
+        bwa mem {input.full_ref} -h 5,1000 {output.fq1} {output.fq2} | \
             k8 ./bin/bwa-postalt.js {complete_reference_alt} | \
             samtools view -hb | \
             samtools sort -n -o {output.out_bam}

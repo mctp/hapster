@@ -163,7 +163,7 @@ rule realign_reads_to_alt_ref:
     threads: NCORES
     shell:
         """
-        bwa mem -t {threads} {complete_reference} {input.fq1} {input.fq2} -R "{params.read_group}" | \
+        bwa mem -t {threads} -h 5,1000 {complete_reference} {input.fq1} {input.fq2} -R "{params.read_group}" | \
             samtools sort -@ {threads} |
             samtools view -@ {threads} -hb > {output.bam}
         """
@@ -244,7 +244,7 @@ rule remove_blacklisted:
     threads: NCORES
     shell:
         """
-        bwa mem -t {threads} {input.extraction_reference} {input.fq1} {input.fq2} | \
+        bwa mem -t {threads} -h 5,1000 {input.extraction_reference} {input.fq1} {input.fq2} | \
             samtools sort -@ {threads} > {output.extracted_sorted_bam}
         samtools index {output.extracted_sorted_bam}
         samtools view -hb -@ {threads} {output.extracted_sorted_bam} {full_regions} |
@@ -291,7 +291,7 @@ rule align_to_alt_ref_final:
     threads: NCORES
     shell:
         """
-        bwa mem -t {threads} {complete_reference} {input.fq1} {input.fq2} -R "{params.read_group}" | \
+        bwa mem -t {threads} -h 5,1000 {complete_reference} {input.fq1} {input.fq2} -R "{params.read_group}" | \
             samtools sort -@ {threads} |
             samtools view -@ {threads} -hb > {output.bam}
         """
