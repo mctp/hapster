@@ -3,6 +3,41 @@ import re
 import os
 from pathlib import Path
 
+def cigar_to_tuples(cigar_string):
+    cigar_dict = {"M":0, "I":1, "D":2, "S":4, "H":5}
+    cigar_tuples = []
+    cur_num = ""
+    for c in cigar_string:
+        if c.isnumeric():
+            cur_num += c
+        else:
+            cigar_tuples.append(tuple([cigar_dict[c], int(cur_num)]))
+            cur_num = ""
+    return cigar_tuples
+
+def expand_xa(in_bam, out_bam):
+    bam = pysam.AlignmentFile(in_bam, 'rb')
+    bam_xa = pysam.AlignmentFile(out_bam, 'wb', template = bam)
+    for read in bam:
+        mapq = read.mapq
+        read.mapq = 60
+        bam_xa.write(read)
+        #Only expand XA tag if it maps exactly as well to the other alt allele
+        if read.has_tag("XA") and mapq == 0 and read.has_tag("NM") and read.cigarstring.find("H") == -1:
+            original_nm = read.get_tag("NM")
+            gene = read.reference_name.split("*")[0]
+            xa = read.get_tag("XA")
+            #Only choose to expand to XA entries in the same gene
+            allele, pos, cigar_string, nm = [align for align in xa.split(";") if align.startswith(gene)][0].split(',')
+            if int(nm) == original_nm:
+                pos = pos.replace("+", "").replace("-", "")
+                read.reference_name = allele
+                read.pos = int(pos) - 1
+                read.set_tag("NM", int(nm))
+                read.cigar = cigar_to_tuples(cigar_string)
+                bam_xa.write(read)
+    bam_xa.close()
+
 # hapster runtime
 PD = Path(config['HAPSTER_DIR'])
 NCORES = config['NCORES']
@@ -35,60 +70,8 @@ rule expand_xa:
         tumor_bam_xa=temp(f"temp/{patient}/alignments/{tumor}_expanded.bam"),
         normal_bam_xa=temp(f"temp/{patient}/alignments/{normal}_expanded.bam")
     run:
-        tumor_bam = pysam.AlignmentFile(input.tumor_bam, 'rb')
-        tumor_bam_xa = pysam.AlignmentFile(output.tumor_bam_xa, 'wb', template = tumor_bam)
-        for read in tumor_bam:
-            mapq = read.mapq
-            read.mapq = 60
-            tumor_bam_xa.write(read)
-            if read.has_tag("XA") and mapq == 0:
-                gene = read.reference_name.split("*")[0]
-                xa = read.get_tag("XA")
-                allele, pos, cigar, nm = [align for align in xa.split(";") if align.startswith(gene)][0].split(',')
-                pos = pos.replace("+", "").replace("-", "")
-                read.reference_name = allele
-                read.pos = int(pos) - 1
-                read.set_tag("NM", int(nm))
-                tumor_bam_xa.write(read)
-        tumor_bam_xa.close()
-        normal_bam = pysam.AlignmentFile(input.normal_bam, 'rb')
-        normal_bam_xa = pysam.AlignmentFile(output.normal_bam_xa, 'wb', template = normal_bam)
-        for read in normal_bam:
-            mapq = read.mapq
-            read.mapq = 60
-            normal_bam_xa.write(read)
-            if read.has_tag("XA") and mapq == 0:
-                gene = read.reference_name.split("*")[0]
-                xa = read.get_tag("XA")
-                allele, pos, cigar, nm = [align for align in xa.split(";") if align.startswith(gene)][0].split(',')
-                pos = pos.replace("+", "").replace("-", "")
-                read.reference_name = allele
-                read.pos = int(pos) - 1
-                read.set_tag("NM", int(nm))
-                normal_bam_xa.write(read)
-        normal_bam_xa.close()
-
-"""
-#rule deprecated, MAPQ changed in rule expand_xa
-rule germline_mapq_to_60:
-    input:
-        tumor_bam = rules.reduce_xa.output.tumor_bam_xa,
-        normal_bam = rules.reduce_xa.output.normal_bam_xa
-    output:
-        tumor_bam_60=temp(f"temp/{tumor}/germline_{tumor}_realigned_deduped_60.bam"),
-        normal_bam_60=temp(f"temp/{normal}/germline_{normal}_realigned_deduped_60.bam")
-    run:
-        tumor_bam = pysam.AlignmentFile(input.tumor_bam, 'rb')
-        tumor_bam_60 = pysam.AlignmentFile(output.tumor_bam_60, 'wb', template = tumor_bam)
-        for read in tumor_bam:
-            read.mapq = 60
-            tumor_bam_60.write(read)
-        normal_bam = pysam.AlignmentFile(input.normal_bam, 'rb')
-        normal_bam_60 = pysam.AlignmentFile(output.normal_bam_60, 'wb', template = normal_bam)
-        for read in normal_bam:
-            read.mapq = 60
-            normal_bam_60.write(read)
-"""
+        expand_xa(input.tumor_bam, output.tumor_bam_xa)
+        expand_xa(input.normal_bam, output.normal_bam_xa)
 
 rule germline_index_xa:
     input:
