@@ -27,15 +27,17 @@ def expand_xa(in_bam, out_bam):
             original_nm = read.get_tag("NM")
             gene = read.reference_name.split("*")[0]
             xa = read.get_tag("XA")
-            #Only choose to expand to XA entries in the same gene
-            allele, pos, cigar_string, nm = [align for align in xa.split(";") if align.startswith(gene)][0].split(',')
-            if int(nm) == original_nm:
-                pos = pos.replace("+", "").replace("-", "")
-                read.reference_name = allele
-                read.pos = int(pos) - 1
-                read.set_tag("NM", int(nm))
-                read.cigar = cigar_to_tuples(cigar_string)
-                bam_xa.write(read)
+            #Only choose to expand to XA alt alignments in the same gene
+            gene_xa = [align for align in xa.split(";") if align.startswith(gene)]
+            if len(gene_xa) > 0:
+                allele, pos, cigar_string, nm = gene_xa[0].split(',')
+                if int(nm) == original_nm:
+                    pos = pos.replace("+", "").replace("-", "")
+                    read.reference_name = allele
+                    read.pos = int(pos) - 1
+                    read.set_tag("NM", int(nm))
+                    read.cigar = cigar_to_tuples(cigar_string)
+                    bam_xa.write(read)
     bam_xa.close()
 
 # hapster runtime
