@@ -23,9 +23,9 @@ Commands:
               args:         [gene] [patient] [sample] [nm] [protocol] <dryrun>
 germline_mutations:     Calls germline mutations in polymorphic genes
               args:         [gene] [patient] [sample] [haplotype] <dryrun>
-  dna_realign:     Realigns DNA sequencing reads to personalized ref with imputed germline variants
+       dna_realign:     Realigns DNA sequencing reads to personalized ref with imputed germline variants
               args:         [gene] [patient] [sample] [germline_vcf] [haplotype_ref] <dryrun>
-  rna_realign:     Realigns RNA sequencing reads to personalized ref
+       rna_realign:     Realigns RNA sequencing reads to personalized ref
               args:         [gene] [patient] [sample] [haplotype_ref] <dryrun>
  somatic_mutations:     Call somatic mutations using mutect2
               args:         [gene] [patient] [normal_sample] [normal_alignment] [tumor_sample] [tumor_alignment] [germline_ref] [gff] [normal_for_kmers] <dryrun>
