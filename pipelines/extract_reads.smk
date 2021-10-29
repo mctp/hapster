@@ -67,7 +67,7 @@ rule cram_to_bam:
         bam = temp(f"temp/{sample}/{sample}_original.bam")
     threads: NCORES
     shell:
-        "samtools view -hb -@ {threads} --reference {input.cram_reference} {input.cram} $(<{input.extraction_regions})> {output.bam}"
+        "samtools view -hb -@ {threads} --reference {input.cram_reference} {input.cram} $(<{input.extraction_regions}) '*' > {output.bam}"
 
 rule bam_regions:
     input:
@@ -77,7 +77,7 @@ rule bam_regions:
         bam = temp(f"temp/{sample}/{sample}_ra.bam")
     threads: NCORES
     shell:
-        "samtools view -hb -@ {threads} {input.bam} $(<{input.extraction_regions})> {output.bam}"
+        "samtools view -hb -@ {threads} {input.bam} $(<{input.extraction_regions}) '*' > {output.bam}"
 
 # step 2: convert bam to fastq
 # Checkpoints used for dynamic output - we don't know how many pieces it will split into ahead of time
