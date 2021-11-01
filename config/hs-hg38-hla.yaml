@@ -23,12 +23,12 @@ genes:
 
 # List of cutoff values when inferring haplotypes
 gene_cor_cutoffs:
-  A: 0.87
-  B: 0.9
-  C: 0.94
-  DPA1: 0.85
-  DPB1: 0.76
-  DQA1: 0.87
-  DQB1: 0.93
-  DRA: 0.76
-  DRB1: 0.89
+  A: 0.75
+  B: 0.75
+  C: 0.75
+  DPA1: 0.75
+  DPB1: 0.78
+  DQA1: 0.75
+  DQB1: 0.75
+  DRA: 0.75
+  DRB1: 0.75
