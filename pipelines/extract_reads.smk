@@ -12,17 +12,23 @@ sample = config['sample']
 aligned_file = config['aligned_file']
 cram_reference = config['cram_reference']
 extraction_regions = config['extraction_regions']
+data_type = config['data_type']
+
+if data_type == "rna":
+    ref_prefix = "rna_"
+else:
+    ref_prefix = ""
 
 # hapster global references
 genes = config['genes']
 fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes]
 fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]
-kmers = PD / config['gene_prefix'] / "sim" / "kmers.txt"
+kmers = PD / config['gene_prefix'] / "sim" / f"{ref_prefix}kmers.txt"
 regions = PD / config['gene_prefix'] / "sim" / "regions.txt"
-complete_reference = PD / config['gene_prefix'] / "fa" / "complete.fa"
-complete_reference_alt = PD / config['gene_prefix'] / "fa" / "complete.fa.alt"
-extraction_reference = PD / config['gene_prefix'] / "fa" / "extraction.fa"
-extraction_reference_alt = PD / config['gene_prefix'] / "fa" / "extraction.fa.alt"
+complete_reference = PD / config['gene_prefix'] / "fa" / f"{ref_prefix}complete.fa"
+complete_reference_alt = PD / config['gene_prefix'] / "fa" / f"{ref_prefix}complete.fa.alt"
+extraction_reference = PD / config['gene_prefix'] / "fa" / f"{ref_prefix}extraction.fa"
+extraction_reference_alt = PD / config['gene_prefix'] / "fa" / f"{ref_prefix}extraction.fa.alt"
 
 # derived variables
 full_regions = ""
