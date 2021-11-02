@@ -58,6 +58,7 @@ case "$1" in
                      sample=$4 \
                      aligned_file=$5 \
                      extraction_regions=$6 \
+                     data_type=$8 \
                      cram_reference=$7 \
             --snakefile $HAPSTER_DIR/pipelines/extract_reads.smk \
             --directory $PWD \
@@ -170,6 +171,7 @@ case "$1" in
                      aligned_file=$6 \
                      cram_reference=$7 \
                      nm=$8 \
+                     extraction_regions=$9 \
             --snakefile $HAPSTER_DIR/pipelines/tune_parameters.smk \
             --directory $PWD \
             --cores $NCORES)
