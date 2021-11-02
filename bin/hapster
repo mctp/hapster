@@ -18,7 +18,7 @@ Commands:
      make_matrices:	    Similate haplotyping matrices
               args:	        [gene] [protocol] [min_insert_length] [max_insert_length] [read_length] [n_reads] [nm] [capture_targets] [similarity] <dryrun>
      extract_reads:	    Extract reads for polymorphic genes
-              args:         [gene] [patient] [sample] [aligned_file] [extraction_regions] <cram_reference> <dryrun>
+              args:         [gene] [patient] [sample] [aligned_file] [extraction_regions] [data_type] <cram_reference> <dryrun>
    infer_haplotype:     Infers haplotype for polymorphic genes
               args:         [gene] [patient] [sample] [nm] [protocol] <dryrun>
 germline_mutations:     Calls germline mutations in polymorphic genes
@@ -26,7 +26,7 @@ germline_mutations:     Calls germline mutations in polymorphic genes
        dna_realign:     Realigns DNA sequencing reads to personalized ref with imputed germline variants
               args:         [gene] [patient] [sample] [germline_vcf] [haplotype_ref] <dryrun>
        rna_realign:     Realigns RNA sequencing reads to personalized ref
-              args:         [gene] [patient] [sample] [haplotype_ref] <dryrun>
+              args:         [gene] [patient] [sample] [haplotype_ref] [readlength] <dryrun>
  somatic_mutations:     Call somatic mutations using mutect2
               args:         [gene] [patient] [normal_sample] [normal_alignment] [tumor_sample] [tumor_alignment] [germline_ref] [gff] [normal_for_kmers] <dryrun>
   *	   Help
