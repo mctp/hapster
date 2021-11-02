@@ -127,19 +127,8 @@ case "$1" in
                      patient=$3 \
                      sample=$4 \
                      ref=$5 \
+                     readlength=$6 \
             --snakefile $HAPSTER_DIR/pipelines/rna_realign.smk \
-            --directory $PWD \
-            --cores $NCORES)
-    ;;
-    rna_realign_bwa)
-        args=( \
-            --configfile $HAPSTER_DIR/config/$2.yaml \
-            --config HAPSTER_DIR=$HAPSTER_DIR \
-                     NCORES=$NCORES \
-                     patient=$3 \
-                     sample=$4 \
-                     haplotype=$5 \
-            --snakefile $HAPSTER_DIR/pipelines/rna_realign_bwa.smk \
             --directory $PWD \
             --cores $NCORES)
     ;;
