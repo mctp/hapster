@@ -12,18 +12,22 @@ sample = config['sample']
 
 # hapster global references
 genes = config['genes']
+gff = config['gff']
 fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes]
 fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]
 
 rule all:
     input:
         germline_ref = f"results/{patient}/refs/{patient}_germline_imputed.fa",
-        germline_realigned_bam = f"results/{patient}/alignments/{sample}_germline_imputed.bam"
+        germline_realigned_bam = f"results/{patient}/alignments/{sample}_germline_imputed.bam",
+        germ_gff = f"results/{patient}/refs/{patient}_germline_imputed.gff",
+        germ_gtf = f"results/{patient}/refs/{patient}_germline_imputed.gtf"
 
 rule make_germline_ref:
     input:
         vcf = germline_vcf,
-        hap_fa = ref
+        hap_fa = ref,
+        gff = gff
     output:
         germ_fa_raw = temp(f"results/{patient}/refs/{patient}_raw_germline_imputed.fa"),
         germ_fa = f"results/{patient}/refs/{patient}_germline_imputed.fa",
@@ -33,10 +37,12 @@ rule make_germline_ref:
         germ_fa_pac = f"results/{patient}/refs/{patient}_germline_imputed.fa.pac",
         germ_fa_fai = f"results/{patient}/refs/{patient}_germline_imputed.fa.fai",
         germ_fa_sa = f"results/{patient}/refs/{patient}_germline_imputed.fa.sa",
-        germ_dict = f"results/{patient}/refs/{patient}_germline_imputed.dict"
+        germ_dict = f"results/{patient}/refs/{patient}_germline_imputed.dict",
+        germ_gff = f"results/{patient}/refs/{patient}_germline_imputed.gff",
+        germ_gtf = f"results/{patient}/refs/{patient}_germline_imputed.gtf"
     shell:
         """
-        python {PD}/scripts/create_germline_ref.py {input.hap_fa} {input.vcf} {output.germ_fa}
+        python {PD}/scripts/create_germline_ref_gff.py {input.hap_fa} {input.vcf} {output.germ_fa} {input.gff} {output.germ_gff}
         """
 
 rule realign_to_germline_ref:

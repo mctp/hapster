@@ -24,9 +24,9 @@ Commands:
 germline_mutations:     Calls germline mutations in polymorphic genes
               args:         [gene] [patient] [sample] [haplotype] <dryrun>
        dna_realign:     Realigns DNA sequencing reads to personalized ref with imputed germline variants
-              args:         [gene] [patient] [sample] [germline_vcf] [haplotype_ref] <dryrun>
+              args:         [gene] [patient] [sample] [germline_vcf] [haplotype_ref] [gff] <dryrun>
        rna_realign:     Realigns RNA sequencing reads to personalized ref
-              args:         [gene] [patient] [sample] [haplotype_ref] [readlength] <dryrun>
+              args:         [gene] [patient] [sample] [haplotype_ref] [gtf] [readlength] <dryrun>
  somatic_mutations:     Call somatic mutations using mutect2
               args:         [gene] [patient] [normal_sample] [normal_alignment] [tumor_sample] [tumor_alignment] [germline_ref] [gff] [normal_for_kmers] <dryrun>
   *	   Help
@@ -115,6 +115,7 @@ case "$1" in
                      sample=$4 \
                      germline_vcf=$5 \
                      ref=$6 \
+                     gff=$7 \
             --snakefile $HAPSTER_DIR/pipelines/realign_to_germline_ref.smk \
             --directory $PWD \
             --cores $NCORES)
@@ -127,7 +128,8 @@ case "$1" in
                      patient=$3 \
                      sample=$4 \
                      ref=$5 \
-                     readlength=$6 \
+                     gtf=$6 \
+                     readlength=$7 \
             --snakefile $HAPSTER_DIR/pipelines/rna_realign.smk \
             --directory $PWD \
             --cores $NCORES)

@@ -9,9 +9,7 @@ patient = config['patient']
 sample = config['sample']
 ref = config['ref']
 overhang = int(config['readlength']) - 1
-
-# hapster global references
-gtf = str(PD / config['gene_prefix'] / "gff" / "alt_genes.gtf")
+gtf = config['gtf']
 
 rule all:
     input:
