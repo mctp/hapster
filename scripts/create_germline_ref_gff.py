@@ -119,12 +119,12 @@ if __name__ == "__main__":
     with open(gff_output, 'w') as of:
         of.write(f"##gff-version 3\n")
         with open(original_gff_file, 'r') as f:
+            cur_allele = ""
+            cur_coding_len = 0
             for line in f:
                 if not line.startswith("#"):
                     line = line.strip().split()
                     #Update segment boundaries and CDS phase based on imputed indels
-                    cur_allele = ""
-                    cur_coding_len = 0
                     if line[0] in hap_ref.seqs.keys():
                         allele = line[0]
                         if allele != cur_allele:
