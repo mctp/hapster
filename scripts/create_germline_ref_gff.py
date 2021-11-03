@@ -122,9 +122,14 @@ if __name__ == "__main__":
             for line in f:
                 if not line.startswith("#"):
                     line = line.strip().split()
-                    #Update segment boundaries based on imputed indels
+                    #Update segment boundaries and CDS phase based on imputed indels
+                    cur_allele = ""
+                    cur_coding_len = 0
                     if line[0] in hap_ref.seqs.keys():
                         allele = line[0]
+                        if allele != cur_allele:
+                            cur_allele = allele
+                            cur_coding_len = 0
                         feature = line[2]
                         if len(offset_positions[allele]) > 0:
                             line[3] = int(line[3])
@@ -153,7 +158,13 @@ if __name__ == "__main__":
                                     line[4] += prev_offset
                                 #If a CDS feature, update the phase of the segment to be length%3
                                 if feature == "CDS":
-                                    line[7] = (end - start) % 3
+                                    if cur_coding_len % 3 == 0:
+                                        line[7] = 0
+                                    elif cur_coding_len % 3 == 1:
+                                        line[7] = 2
+                                    else:
+                                        line[7] = 1
+                                    cur_coding_len += end - start + 1
                         line_joined = "\t".join([str(x) for x in line])
                         of.write(f"{line_joined}\n")
 
