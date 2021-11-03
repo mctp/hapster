@@ -164,7 +164,7 @@ if __name__ == "__main__":
                                         line[7] = 2
                                     else:
                                         line[7] = 1
-                                    cur_coding_len += end - start + 1
+                                    cur_coding_len += line[4] - line[3] + 1
                         line_joined = "\t".join([str(x) for x in line])
                         of.write(f"{line_joined}\n")
 
