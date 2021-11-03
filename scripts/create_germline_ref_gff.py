@@ -151,6 +151,9 @@ if __name__ == "__main__":
                                     line[3] += prev_offset
                                 if not end_changed:
                                     line[4] += prev_offset
+                                #If a CDS feature, update the phase of the segment to be length%3
+                                if feature == "CDS":
+                                    line[7] = (end - start) % 3
                         line_joined = "\t".join([str(x) for x in line])
                         of.write(f"{line_joined}\n")
 
