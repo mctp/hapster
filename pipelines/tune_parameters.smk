@@ -5,7 +5,7 @@
 import os
 from pathlib import Path
 
-cutoffs = [x/100 for x in range(50, 100, 1)]
+cutoffs = [x/100 for x in range(25, 100, 1)]
 
 configfilename = workflow.overwrite_configfiles[0]
 
