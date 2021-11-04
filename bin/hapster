@@ -58,8 +58,8 @@ case "$1" in
                      sample=$4 \
                      aligned_file=$5 \
                      extraction_regions=$6 \
-                     data_type=$8 \
-                     cram_reference=$7 \
+                     data_type=$7 \
+                     cram_reference=$8 \
             --snakefile $HAPSTER_DIR/pipelines/extract_reads.smk \
             --directory $PWD \
             --cores $NCORES)
