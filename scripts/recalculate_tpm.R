@@ -1,7 +1,5 @@
 library(dplyr)
 library(readr)
-library(tidyr)
-library(ggplot2)
 
 #Read in command line arguments
 args <- commandArgs(trailingOnly = TRUE)
