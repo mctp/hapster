@@ -13,8 +13,8 @@ gtf = config['gtf']
 
 rule all:
     input:
-        bam = f"results/{patient}/alignments/{sample}.Aligned.sortedByCoord.out.bam",
-        bam_bai = f"results/{patient}/alignments/{sample}.Aligned.sortedByCoord.out.bam.bai"
+        bam = f"results/{patient}/alignments/{sample}.Aligned.primary.out.bam",
+        bam_bai = f"results/{patient}/alignments/{sample}.Aligned.primary.out.bam.bai"
 
 rule make_rna_ref:
     input:
@@ -43,11 +43,12 @@ rule realign_to_germline_ref:
         fq2 = f"results/{patient}/seqs/{sample}_2.fq",
         gtf = gtf
     output:
-        bam = f"results/{patient}/alignments/{sample}.Aligned.sortedByCoord.out.bam",
-        bam_bai = f"results/{patient}/alignments/{sample}.Aligned.sortedByCoord.out.bam.bai"
+        raw_bam = f"temp/{patient}/alignments/{sample}.Aligned.sortedByCoord.out.bam",
+        bam = f"results/{patient}/alignments/{sample}.Aligned.primary.out.bam",
+        bam_bai = f"results/{patient}/alignments/{sample}.Aligned.primary.out.bam.bai"
     params:
         genome_dir = f"results/{patient}/refs/{patient}_STAR",
-        prefix = f"results/{patient}/alignments/{sample}."
+        prefix = f"temp/{patient}/alignments/{sample}."
     threads: NCORES
     shell:
         """
@@ -58,5 +59,6 @@ rule realign_to_germline_ref:
             --outFileNamePrefix {params.prefix} \
             --outSAMtype BAM SortedByCoordinate \
             --quantMode GeneCounts
+        samtools view -F 256 -hb {output.raw_bam} > {output.bam}
         samtools index {output.bam}
         """
