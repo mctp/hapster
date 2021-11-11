@@ -17,8 +17,10 @@ Commands:
               args:	        [gene] <dryrun>  
      make_matrices:	    Similate haplotyping matrices
               args:	        [gene] [protocol] [min_insert_length] [max_insert_length] [read_length] [n_reads] [nm] [capture_targets] [similarity] <dryrun>
-     extract_reads:	    Extract reads for polymorphic genes
-              args:         [gene] [patient] [sample] [aligned_file] [extraction_regions] [data_type] <cram_reference> <dryrun>
+       extract_dna:	    Extract reads for polymorphic genes
+              args:         [gene] [patient] [sample] [aligned_file] [extraction_regions] <cram_reference> <dryrun>
+       extract_rna:	    Extract reads for polymorphic genes
+              args:         [gene] [patient] [sample] [aligned_file] [extraction_regions] [readlength] <cram_reference> <dryrun>
    infer_haplotype:     Infers haplotype for polymorphic genes
               args:         [gene] [patient] [sample] [nm] [protocol] <dryrun>
 germline_mutations:     Calls germline mutations in polymorphic genes
@@ -49,7 +51,7 @@ case "$1" in
             --directory $HAPSTER_DIR \
             --cores $NCORES)
     ;;
-    extract_reads)
+    extract_dna)
         args=( \
             --configfile $HAPSTER_DIR/config/$2.yaml \
             --config HAPSTER_DIR=$HAPSTER_DIR \
@@ -58,9 +60,23 @@ case "$1" in
                      sample=$4 \
                      aligned_file=$5 \
                      extraction_regions=$6 \
-                     data_type=$7 \
+                     cram_reference=$7 \
+            --snakefile $HAPSTER_DIR/pipelines/extract_dna.smk \
+            --directory $PWD \
+            --cores $NCORES)
+    ;;
+    extract_rna)
+        args=( \
+            --configfile $HAPSTER_DIR/config/$2.yaml \
+            --config HAPSTER_DIR=$HAPSTER_DIR \
+                     NCORES=$NCORES \
+                     patient=$3 \
+                     sample=$4 \
+                     aligned_file=$5 \
+                     extraction_regions=$6 \
+                     readlength=$7 \
                      cram_reference=$8 \
-            --snakefile $HAPSTER_DIR/pipelines/extract_reads.smk \
+            --snakefile $HAPSTER_DIR/pipelines/extract_rna.smk \
             --directory $PWD \
             --cores $NCORES)
     ;;
