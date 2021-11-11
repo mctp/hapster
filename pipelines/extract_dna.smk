@@ -17,12 +17,12 @@ extraction_regions = config['extraction_regions']
 genes = config['genes']
 fq1s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_1.fq") for gene in genes]
 fq2s = [str(PD / "results" / patient / "seqs" / sample / f"{sample}_{gene}_2.fq") for gene in genes]
-kmers = PD / config['gene_prefix'] / "sim" / f"{ref_prefix}kmers.txt"
+kmers = PD / config['gene_prefix'] / "sim" / f"kmers.txt"
 regions = PD / config['gene_prefix'] / "sim" / "regions.txt"
-complete_reference = PD / config['gene_prefix'] / "fa" / f"{ref_prefix}complete.fa"
-complete_reference_alt = PD / config['gene_prefix'] / "fa" / f"{ref_prefix}complete.fa.alt"
-extraction_reference = PD / config['gene_prefix'] / "fa" / f"{ref_prefix}extraction.fa"
-extraction_reference_alt = PD / config['gene_prefix'] / "fa" / f"{ref_prefix}extraction.fa.alt"
+complete_reference = PD / config['gene_prefix'] / "fa" / f"complete.fa"
+complete_reference_alt = PD / config['gene_prefix'] / "fa" / f"complete.fa.alt"
+extraction_reference = PD / config['gene_prefix'] / "fa" / f"extraction.fa"
+extraction_reference_alt = PD / config['gene_prefix'] / "fa" / f"extraction.fa.alt"
 
 # derived variables
 full_regions = ""
