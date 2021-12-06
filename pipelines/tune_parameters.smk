@@ -21,7 +21,6 @@ aligned_file = config['aligned_file']
 nm = config['nm']
 cram_reference = config['cram_reference']
 extraction_regions = config['extraction_regions']
-data_type = config['data_type']
 
 #Algorithm parameters
 genes = config['genes']
@@ -58,8 +57,7 @@ rule extract_reads:
                      aligned_file={aligned_file} \
                      cram_reference={cram_reference} \
                      extraction_regions={extraction_regions} \
-                     data_type={data_type} \
-            --snakefile {PD}/pipelines/extract_reads.smk \
+            --snakefile {PD}/pipelines/extract_dna.smk \
             --directory {PD} \
             --cores {NCORES} --notemp
         snakemake \
@@ -71,8 +69,7 @@ rule extract_reads:
                      aligned_file={aligned_file} \
                      cram_reference={cram_reference} \
                      extraction_regions={extraction_regions} \
-                     data_type={data_type} \
-            --snakefile {PD}/pipelines/extract_reads.smk \
+            --snakefile {PD}/pipelines/extract_dna.smk \
             --directory {PD} \
             --cores {NCORES} --notemp
         """

@@ -179,7 +179,6 @@ case "$1" in
                      cram_reference=$7 \
                      nm=$8 \
                      extraction_regions=$9 \
-                     data_type=$10 \
             --snakefile $HAPSTER_DIR/pipelines/tune_parameters.smk \
             --directory $PWD \
             --cores $NCORES)
